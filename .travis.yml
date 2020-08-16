@@ -21,13 +21,12 @@ matrix:
 
         - dotnet publish FightCore.Bot/FightCore.Bot.csproj --self-contained true --runtime linux-x64 -c Release
 
-        - cd ${TRAVIS_BUILD_DIR}/FightCore.Bot/FightCore.Bot/bin/Release/netcoreapp3.1/linux-x64/publish/
+        - tar -zcf Bot-Linux-x64.tar.gz ${TRAVIS_BUILD_DIR}/FightCore.Bot/FightCore.Bot/bin/Release/netcoreapp3.1/linux-x64/publish/
 
-        - zip Bot.zip
       deploy:
         provider: releases
         api_key: $TOKEN
-        file: "${TRAVIS_BUILD_DIR}/FightCore.Bot/FightCore.Bot/bin/Release/netcoreapp3.1/linux-x64/publish/Bot.zip"
+        file: "Bot-Linux-x64.tar.gz"
         skip_cleanup: true
         on:
           tags: true
