@@ -19,7 +19,7 @@ matrix:
  
         - dotnet build
 
-        - dotnet publish FightCore.Bot/FightCore.Bot.csproj --self-contained true --runtime linux-x64 -p:PublishSingleFile=true
+        - dotnet publish FightCore.Bot/FightCore.Bot.csproj --self-contained true --runtime linux-x64 -p:PublishSingleFile=true -c Release
       deploy:
         provider: releases
         api_key: $TOKEN
