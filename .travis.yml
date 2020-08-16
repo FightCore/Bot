@@ -23,10 +23,10 @@ matrix:
       deploy:
         provider: releases
         api_key: $TOKEN
-        file: "FightCore.Bot/bin/Release/netcoreapp3.1/publish/FightCore.Bot"
+        file: "bin/Release/netcoreapp3.1/publish/FightCore.Bot"
         skip_cleanup: true
         on:
-          tags: true
+          tags: false
       global:
         # Some global settings to make the experience better,
         - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
