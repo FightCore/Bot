@@ -1,0 +1,39 @@
+sudo: required
+git:
+  depth: false
+matrix:
+  include:
+    - language: csharp
+      mono: none
+      dotnet: 3.1
+      dist: xenial
+      install:
+        - cd FightCore.Bot
+        - dotnet restore
+      before_script:
+        # Script to expose the dotnet CLI tools.
+        - export PATH="$PATH:$HOME/.dotnet/tools"
+      script:
+        # Run restore to restore the NuGet packages
+        - dotnet restore
+ 
+        - dotnet build
+
+        - dotnet publish --self-contained true --runtime linux-64 -p:PublishSingleFile=true
+      deploy:
+        provider: releases
+        api_key: $TOKEN
+        file: "FightCore.Bot/bin/Release/netcoreapp3.1/publish/FightCore.Bot"
+        skip_cleanup: true
+        on:
+          tags: true
+      global:
+        # Some global settings to make the experience better,
+        - DOTNET_SKIP_FIRST_TIME_EXPERIENCE=true
+        - DOTNET_CLI_TELEMETRY_OPTOUT=1
+      cache:
+        directories:
+          # Cache the NuGet and SonarCloud folders.
+          - "$HOME/.nuget/packages"
+          - "$HOME/.local/share/NuGet/Cache"
+          - "$HOME/.sonar/cache"
