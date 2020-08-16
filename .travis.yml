@@ -21,7 +21,7 @@ matrix:
 
         - dotnet publish FightCore.Bot/FightCore.Bot.csproj --self-contained true --runtime linux-x64 -c Release
 
-        -cd FightCore.Bot/bin/Release/netcoreapp3.1/linux-x64/publish/
+        - cd FightCore.Bot/bin/Release/netcoreapp3.1/linux-x64/publish/
 
         - tar -zcf Bot-Linux-x64.tar.gz ./
 
