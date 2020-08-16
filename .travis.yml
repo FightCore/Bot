@@ -20,10 +20,12 @@ matrix:
         - dotnet build
 
         - dotnet publish FightCore.Bot/FightCore.Bot.csproj --self-contained true --runtime linux-x64 -p:PublishSingleFile=true -c Release
+
+        - cd $TRAVIS_BUILD_DIR
       deploy:
         provider: releases
         api_key: $TOKEN
-        file: "bin/Release/netcoreapp3.1/publish/FightCore.Bot"
+        file: "FightCore.Bot/FightCore.Bot/bin/Release/netcoreapp3.1/publish/FightCore.Bot"
         skip_cleanup: true
         on:
           tags: false
