@@ -18,10 +18,8 @@ matrix:
         - dotnet restore
  
         - dotnet build
-      script:
+
         - dotnet publish FightCore.Bot/FightCore.Bot.csproj --self-contained true --runtime linux-x64 -p:PublishSingleFile=true
-        on:
-          tags: true
       deploy:
         provider: releases
         api_key: $TOKEN
