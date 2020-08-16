@@ -4,7 +4,6 @@ using Discord.Commands;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators.Tournaments;
 using Microsoft.Extensions.Options;
-using Smashgg.Net.Logic.Client;
 
 namespace FightCore.Bot.Modules
 {
@@ -21,16 +20,17 @@ namespace FightCore.Bot.Modules
         [Command]
         public async Task Info([Remainder] string slug)
         {
-            if (!_isEnabled)
-            {
-                return;
-            }
+            // WIP commenting for now
+            //if (!_isEnabled)
+            //{
+            //    return;
+            //}
 
-            var smashggNetClient = new SmashggNetClient(Environment.GetEnvironmentVariable("token"));
-            var tournament = await smashggNetClient.TournamentEndpoint.GetTournamentWithNestedEntities(slug);
+            //var smashggNetClient = new SmashggNetClient(Environment.GetEnvironmentVariable("token"));
+            //var tournament = await smashggNetClient.TournamentEndpoint.GetTournamentWithNestedEntities(slug);
 
-            var embed = new TournamentEmbedCreator(null).Create(tournament);
-            await ReplyAsync("", embed: embed);
+            //var embed = new TournamentEmbedCreator(null).Create(tournament);
+            //await ReplyAsync("", embed: embed);
         }
     }
 }
