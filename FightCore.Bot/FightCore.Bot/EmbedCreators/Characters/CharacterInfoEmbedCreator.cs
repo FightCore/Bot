@@ -125,7 +125,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             AddIfPossible("Percent (weak hit)", move.PercentWeak, frameDataBuilder);
             AddIfPossible("IASA", move.Iasa, frameDataBuilder);
 
-            if (move.AutoCancelStart.HasValue && move.AutoCancelEnd.HasValue)
+            if (move.AutoCancelStart.HasValue && move.AutoCancelEnd.HasValue && move.AutoCancelStart > -1 && move.AutoCancelEnd > -1)
             {
                 frameDataBuilder.AppendLine($"**Won't Auto Cancel:** {move.AutoCancelStart}-{move.AutoCancelEnd}");
             }
