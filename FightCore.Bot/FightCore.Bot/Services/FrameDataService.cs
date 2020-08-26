@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using FightCore.Bot.Helpers;
 using FightCore.Bot.Models.FrameData;
+using FightCore.Bot.Models.Helpers;
 using FightCore.MeleeFrameData;
 using Newtonsoft.Json;
 
@@ -14,6 +15,7 @@ namespace FightCore.Bot.Services
         private readonly List<WrapperCharacter> _characters;
         private readonly List<Misc> _miscs;
         private readonly List<NormalizedEntity> _entities;
+        private readonly List<MoveAlias> _moveAliases;
 
         public FrameDataService()
         {
@@ -22,13 +24,14 @@ namespace FightCore.Bot.Services
             List<Grab> grabs;
             List<Throw> throws;
             _characters = JsonConvert.DeserializeObject<List<WrapperCharacter>>(File.ReadAllText("Data/Names.json"));
+            _moveAliases = JsonConvert.DeserializeObject<List<MoveAlias>>(File.ReadAllText("Data/MoveAlias.json"));
 
             foreach (var wrapperCharacter in _characters)
             {
                 wrapperCharacter.NormalizedName = SearchHelper.Normalize(wrapperCharacter.Name);
             }
 
-            using (var frameDataContext = new FrameDataContext())
+            using (var frameDataContext = new MeleeFrameDataContext())
             {
                 attacks = frameDataContext.Attacks.ToList();
                 dodges = frameDataContext.Dodges.ToList();
@@ -111,6 +114,17 @@ namespace FightCore.Bot.Services
             //==================================
             var normalizedMove = SearchHelper.Normalize(move);
             var characterEntity = GetCharacter(character);
+
+            //==================================
+            // Step 1.5: Get move aliases for specific things like "b" meaning "neutralb".
+            //==================================
+            var alias = _moveAliases.FirstOrDefault(moveAlias =>
+                moveAlias.Alias.Any(storedAlias => storedAlias == normalizedMove));
+
+            if (alias != null)
+            {
+                normalizedMove = alias.Move;
+            }
 
             //==================================
             // Step 2: Check if the move is a special name like Shine or Knee.

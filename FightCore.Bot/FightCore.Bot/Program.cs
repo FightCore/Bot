@@ -29,7 +29,7 @@ namespace FightCore.Bot
             _config = BuildConfig();
 
             var services = ConfigureServices();
-            services.GetRequiredService<LogService>();
+            services.GetRequiredService<LogService>(); 
             await services.GetRequiredService<CommandHandlingService>().InitializeAsync(services);
 
             //_client.GuildAvailable += guild =>
