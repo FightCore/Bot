@@ -21,11 +21,11 @@ namespace FightCore.Bot.EmbedCreators.Characters
         {
         }
 
-        public Embed CreateInfoEmbed(Character character, Misc misc)
+        public Embed CreateInfoEmbed(WrapperCharacter wrapperCharacter, Character character, Misc misc)
         {
-            var embedBuilder = new EmbedBuilder {Title = character.Name};
+            var embedBuilder = new EmbedBuilder {Title = wrapperCharacter.Name};
 
-            if (EmbedSettings.FightCoreInfo)
+            if (EmbedSettings.FightCoreInfo && character != null)
             {
                 embedBuilder.AddField("General information", ShortenString(character.GeneralInformation, 250));
 
@@ -37,10 +37,10 @@ namespace FightCore.Bot.EmbedCreators.Characters
                 }
             }
 
-            if (character.StockIcon != null)
+            if (character?.StockIcon != null)
                 embedBuilder.WithThumbnailUrl(character.StockIcon.Url);
 
-            if (character.CharacterImage != null)
+            if (character?.CharacterImage != null)
                 embedBuilder.WithImageUrl(character.CharacterImage.Url);
 
             var stringBuilder = new StringBuilder();
@@ -54,7 +54,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             stringBuilder.AppendLine($"**Jump squat:** {misc.JumpSquat}");
             embedBuilder.AddField("Frame data", stringBuilder.ToString());
 
-            embedBuilder.WithUrl($"https://www.fightcore.gg/character/{character.Id}");
+            embedBuilder.WithUrl($"https://www.fightcore.gg/character/{wrapperCharacter.FightCoreId}");
             embedBuilder = AddFooter(embedBuilder);
             return embedBuilder.Build();
         }
@@ -74,8 +74,11 @@ namespace FightCore.Bot.EmbedCreators.Characters
         public Embed CreateMoveListEmbed(WrapperCharacter character, List<NormalizedEntity> moves, Character fightCoreCharacter)
         {
             var embedBuilder = new EmbedBuilder();
-            embedBuilder.WithUrl($"http://meleeframedata.com/{character.NormalizedName}")
-                .WithThumbnailUrl(fightCoreCharacter.StockIcon.Url.Replace(" ", "+"));
+            embedBuilder.WithUrl($"http://meleeframedata.com/{character.NormalizedName}");
+            if (fightCoreCharacter != null)
+            {
+                embedBuilder.WithThumbnailUrl(fightCoreCharacter.StockIcon.Url.Replace(" ", "+"));
+            }
             embedBuilder.Title = $"{character.Name} - Moves";
 
             embedBuilder.AddField("Moves", ShortenField(
@@ -208,8 +211,12 @@ namespace FightCore.Bot.EmbedCreators.Characters
             var moveName = SearchHelper.Normalize(move.NormalizedType);
             var embedBuilder = new EmbedBuilder()
                 .WithUrl($"http://meleeframedata.com/{move.Character}")
-                .WithThumbnailUrl(fightCoreCharacter.StockIcon.Url.Replace(" ", "+"))
                 .WithImageUrl($"https://i.fightcore.gg/melee/moves/{characterName}/{moveName}.gif");
+
+            if (fightCoreCharacter != null)
+            {
+                embedBuilder.WithThumbnailUrl(fightCoreCharacter.StockIcon.Url.Replace(" ", "+"));
+            }
 
             embedBuilder.Title = $"{character.Name} - {move.Name}";
             return AddFooter(embedBuilder);

@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using FightCore.Api.Models;
 using RestSharp;
 
@@ -19,10 +20,17 @@ namespace FightCore.Api.Services
             _client = new RestClient("https://api.fightcore.gg");
         }
 
-        public Task<Character> GetByIdAsync(long id)
+        public async Task<Character> GetByIdAsync(long id)
         {
-            var request = new RestRequest($"characters/{id}", Method.GET);
-            return _client.GetAsync<Character>(request);
+            try
+            {
+                var request = new RestRequest($"characters/{id}", Method.GET);
+                return await _client.GetAsync<Character>(request);
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

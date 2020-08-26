@@ -142,7 +142,7 @@ namespace FightCore.Bot.Modules
 
                 var fightCoreCharacter = await _characterService.GetByIdAsync(characterEntity.FightCoreId);
                 var misc = _frameDataService.GetMiscForCharacter(characterEntity.NormalizedName);
-                var embed = _characterInfoEmbedCreator.CreateInfoEmbed(fightCoreCharacter, misc);
+                var embed = _characterInfoEmbedCreator.CreateInfoEmbed(characterEntity, fightCoreCharacter, misc);
 
                 await ReplyAsync(string.Empty, embed: embed);
             }
