@@ -127,6 +127,29 @@ namespace FightCore.Bot.Services
             }
 
             //==================================
+            // Step 1.75: Check if the move contains something like "air"
+            //==================================
+            var airAliases = new[] { "(air)", "aerial" };
+            foreach (var airAlias in airAliases)
+            {
+                // Check the standard non-normalized as the ( and ) would get filtered out by the normalization
+                // Note that we cant search for "air" because bair, fair, dair and uair would be messed up.
+                if (!move.Contains(airAlias))
+                {
+                    continue;
+                }
+
+                move = move.Replace(airAlias, "");
+                // Add "a" as a prefix because thats how the aerial move names work.
+                move = "a" + move;
+
+                // Normalize it after all to make sure the rest works.
+                normalizedMove = SearchHelper.Normalize(move);
+                break;
+            }
+
+
+            //==================================
             // Step 2: Check if the move is a special name like Shine or Knee.
             //==================================
             if (characterEntity.Moves?.Any() == true)
