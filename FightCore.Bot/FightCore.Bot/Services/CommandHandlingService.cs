@@ -14,7 +14,7 @@ namespace FightCore.Bot.Services
         private readonly DiscordSocketClient _discord;
         private readonly CommandService _commands;
         private IServiceProvider _provider;
-        private readonly char _prefix;
+        private readonly CommandSettings _settings;
 
         public CommandHandlingService(
             IServiceProvider provider,
@@ -25,7 +25,7 @@ namespace FightCore.Bot.Services
             _discord = discord;
             _commands = commands;
             _provider = provider;
-            _prefix = commandSettings.Value.Prefix;
+            _settings = commandSettings.Value;
 
             _discord.MessageReceived += MessageReceived;
         }
@@ -43,8 +43,19 @@ namespace FightCore.Bot.Services
             if (!(rawMessage is SocketUserMessage message)) return;
             if (message.Source != MessageSource.User) return;
 
+            // Check if there is a channel id specified.
+            // If there is, check if its the correct channel, else just return and ignore.
+            if (_settings.ChannelId.HasValue && message.Channel.Id != _settings.ChannelId.Value)
+            {
+                return;
+            }
+
             var argPos = 0;
-            if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos) && !message.HasCharPrefix(_prefix, ref argPos)) return;
+            if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos) &&
+                !message.HasCharPrefix(_settings.Prefix, ref argPos))
+            {
+                return;
+            }
 
             var context = new SocketCommandContext(_discord, message);
 
