@@ -20,7 +20,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FightCore.Api\FightCore.Api.csproj" />
-    <ProjectReference Include="..\FightCore.FrameData\FightCore.FrameData.csproj" />
     <ProjectReference Include="..\FightCore.MeleeFrameData\FightCore.MeleeFrameData.csproj" />
   </ItemGroup>
 
