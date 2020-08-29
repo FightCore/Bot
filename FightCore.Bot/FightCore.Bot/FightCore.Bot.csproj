@@ -21,6 +21,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FightCore.Api\FightCore.Api.csproj" />
     <ProjectReference Include="..\FightCore.MeleeFrameData\FightCore.MeleeFrameData.csproj" />
+    <ProjectReference Include="..\FightCore.SlippiStatsOnline\FightCore.SlippiStatsOnline.csproj" />
   </ItemGroup>
 
   <ItemGroup>

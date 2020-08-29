@@ -16,9 +16,12 @@ namespace FightCore.Bot.EmbedCreators.Characters
     public class CharacterInfoEmbedCreator : BaseEmbedCreator
     {
 
+        private readonly char _prefix;
 
-        public CharacterInfoEmbedCreator(IOptions<EmbedSettings> embedSettings) : base(embedSettings)
+        public CharacterInfoEmbedCreator(IOptions<EmbedSettings> embedSettings,
+            IOptions<CommandSettings> commandSetting) : base(embedSettings)
         {
+            _prefix = commandSetting.Value.Prefix;
         }
 
         public Embed CreateInfoEmbed(WrapperCharacter wrapperCharacter, Character character, Misc misc)
@@ -83,8 +86,8 @@ namespace FightCore.Bot.EmbedCreators.Characters
 
             embedBuilder.AddField("Moves", ShortenField(
                 string.Join(", ", moves.Select(move => move.Name))))
-                .AddField("Help", "To check out a move use:\n`-character move {CHARACTER NAME} {MOVE NAME}`\n" +
-                                          "For example: `-character move Fox u-smash`");
+                .AddField("Help", "To check out a move use:\n`" + _prefix + "character move {CHARACTER NAME} {MOVE NAME}`\n" +
+                                          "For example: `" + _prefix + "character move Fox u-smash`");
 
             embedBuilder = AddFooter(embedBuilder);
             return embedBuilder.Build();
@@ -95,21 +98,21 @@ namespace FightCore.Bot.EmbedCreators.Characters
             var embedBuilder = new EmbedBuilder();
             embedBuilder.WithTitle("Help");
             embedBuilder.AddField("Character statistics",
-                "`-c {{NAME}}`\n" +
+                "`" + _prefix + "c {{NAME}}`\n" +
                 "Use this command to get information about a character " +
                 "Note that character names with spaces need to have quotes, " +
-                "`-c \"Ice climbers\"`. Most of these names can shortened (Ice Climbers = ics)\n" +
-                "Example: `-c Kirby`");
+                "`" + _prefix + "c \"Ice climbers\"`. Most of these names can shortened (Ice Climbers = ics)\n" +
+                "Example: `" + _prefix + "c Kirby`");
             embedBuilder.AddField("Move list",
-                "`-c moves {{NAME}}`\n" +
+                "`" + _prefix + "c moves {{NAME}}`\n" +
                 "Use this command to get a list of moves that are available for that character. " +
                 "Note that the special move names can also be shortened to their input (Fox Blaster = neutral b).\n" +
-                "Example: `-c moves g&w`");
+                "Example: `" + _prefix + "c moves g&w`");
             embedBuilder.AddField("Move frame data",
-                "`-c m {{CHARACTER}} {{MOVE}}`\n" +
+                "`" + _prefix + "c m {{CHARACTER}} {{MOVE}}`\n" +
                 "Use this command to get the frame data about a move, note that character can only be one word here!" +
                 " Shorten your character names to make them fit (Ice Climbers = ics)\n" +
-                "Example: `-c m falcon u-tilt`");
+                "Example: `" + _prefix + "c m falcon u-tilt`");
             embedBuilder = AddFooter(embedBuilder);
 
             return embedBuilder.Build();

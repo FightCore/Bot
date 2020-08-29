@@ -8,7 +8,9 @@ using FightCore.Api.Services;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators;
 using FightCore.Bot.EmbedCreators.Characters;
+using FightCore.Bot.EmbedCreators.Slippi;
 using FightCore.Bot.Services;
+using FightCore.SlippiStatsOnline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
@@ -61,8 +63,10 @@ namespace FightCore.Bot
                 .Configure<ModuleSettings>(_config.GetSection("Modules"))
                 .Configure<CommandSettings>(_config.GetSection("CommandSettings"))
                 .AddScoped<ICharacterService, CharacterService>()
+                .AddScoped<ISlippiPlayerService, SlippiPlayerService>()
                 .AddScoped<CharacterInfoEmbedCreator>()
                 .AddScoped<NotFoundEmbedCreator>()
+                .AddScoped<PlayerEmbedCreator>()
                 // Add additional services here...
                 .BuildServiceProvider();
         }
