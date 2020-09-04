@@ -4,5 +4,11 @@
     "alias": [
       "b"
     ]
+  },
+  {
+    "move": "grab",
+    "alias": [
+      "shieldgrab"
+    ]
   }
 ]
