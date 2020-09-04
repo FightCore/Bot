@@ -166,6 +166,9 @@
       "princesspeach",
       "peach"
     ],
+    "Moves": {
+      "turnip": "downb" 
+    },
     "FightCoreId": 240
   },
   {
