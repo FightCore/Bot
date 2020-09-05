@@ -19,7 +19,7 @@
     ]
   },
   {
-    "move": "backwardsroll",
+    "move": "backroll",
     "alias": [
       "broll",
       "backwardroll"
