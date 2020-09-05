@@ -7,5 +7,7 @@
         public bool Moves { get; set; }
 
         public bool Tournaments { get; set; }
+
+        public bool SlippiStats { get; set; }
     }
 }

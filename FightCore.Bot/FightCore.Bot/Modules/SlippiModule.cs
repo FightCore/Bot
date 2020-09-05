@@ -4,9 +4,11 @@ using System.Text;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
+using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators;
 using FightCore.Bot.EmbedCreators.Slippi;
 using FightCore.SlippiStatsOnline;
+using Microsoft.Extensions.Options;
 
 namespace FightCore.Bot.Modules
 {
@@ -16,19 +18,27 @@ namespace FightCore.Bot.Modules
         private readonly ISlippiPlayerService _slippiPlayerService;
         private readonly NotFoundEmbedCreator _notFoundEmbedCreator;
         private readonly PlayerEmbedCreator _playerEmbedCreator;
+        private readonly bool _enabled;
 
         public SlippiModule(ISlippiPlayerService slippiPlayerService,
             NotFoundEmbedCreator notFoundEmbedCreator,
-            PlayerEmbedCreator playerEmbedCreator)
+            PlayerEmbedCreator playerEmbedCreator,
+            IOptions<ModuleSettings> moduleSettings)
         {
             _slippiPlayerService = slippiPlayerService;
             _notFoundEmbedCreator = notFoundEmbedCreator;
             _playerEmbedCreator = playerEmbedCreator;
+            _enabled = moduleSettings.Value.SlippiStats;
         }
 
         [Command]
         public async Task GetPlayerInfo([Remainder] string tags)
         {
+            if (!_enabled)
+            {
+                return;
+            }
+
             var splitTags = tags.Split(" vs ");
             string opponentCode = null;
             if (splitTags.Length == 2)

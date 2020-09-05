@@ -61,9 +61,23 @@ namespace FightCore.Bot.Services
 
             var result = await _commands.ExecuteAsync(context, argPos, _provider);
 
-            if (result.Error.HasValue &&
-                result.Error.Value != CommandError.UnknownCommand)
-                await context.Channel.SendMessageAsync(result.ToString());
+            if (result.Error.HasValue)
+            {
+                var resultMessage = result.Error switch
+                {
+                    CommandError.UnknownCommand => null,
+                    CommandError.BadArgCount => "**Bad number of arguments**\nDouble check if your command is correct.",
+                    _ => "An unknown error occurred while trying to process the command."
+                };
+
+                if (string.IsNullOrWhiteSpace(resultMessage))
+                {
+                    return;
+                }
+
+
+                await context.Channel.SendMessageAsync(resultMessage);
+            }
         }
     }
 }
