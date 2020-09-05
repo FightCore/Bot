@@ -41,7 +41,8 @@
       "falco"
     ],
     "Moves": {
-      "laser": "neutralb"
+      "laser": "neutralb",
+      "shine": "downb" 
     },
     "FightCoreId": 218
   },

@@ -10,5 +10,19 @@
     "alias": [
       "shieldgrab"
     ]
+  },
+  {
+    "move": "forwardroll",
+    "alias": [
+      "froll",
+      "forwardsroll"
+    ]
+  },
+  {
+    "move": "backwardsroll",
+    "alias": [
+      "broll",
+      "backwardroll"
+    ] 
   }
 ]
