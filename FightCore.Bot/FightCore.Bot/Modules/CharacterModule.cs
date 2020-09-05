@@ -73,6 +73,11 @@ namespace FightCore.Bot.Modules
                     var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string>()
                         {{"Character", character}});
                     await ReplyAsync("", embed: notFoundEmbed);
+
+                    if (_loggingSettings.Moves)
+                    {
+                        _logger.LogMessage(LogLevel.Information, "NOT FOUND [Character]: {0}", character);
+                    }
                     return;
                 }
 
@@ -81,6 +86,11 @@ namespace FightCore.Bot.Modules
 
                 if (attack == null)
                 {
+                    if (_loggingSettings.Moves)
+                    {
+                        _logger.LogMessage(LogLevel.Warning, "NOT FOUND [Character]: {0}, [Move]: {1}", character, move);
+                    }
+
                     var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string>()
                         {{"Character", character}, {"Move", move}});
                     await ReplyAsync("", embed: notFoundEmbed);
@@ -90,7 +100,7 @@ namespace FightCore.Bot.Modules
                 var embed = _characterInfoEmbedCreator.CreateMoveEmbed(characterEntity, attack, fightCoreCharacter);
                 if (_loggingSettings.Moves)
                 {
-                    _logger.LogMessage("[Character]: {0}, [Move]: {1}", characterEntity.Name, attack.Name);
+                    _logger.LogMessage(LogLevel.Information, "[Character]: {0}, [Move]: {1}", characterEntity.Name, attack.Name);
                 }
 
                 await ReplyAsync(string.Empty, embed: embed);
@@ -114,6 +124,12 @@ namespace FightCore.Bot.Modules
                     var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string>()
                         {{"Character", character}});
                     await ReplyAsync("", embed: notFoundEmbed);
+
+                    if (_loggingSettings.Moves)
+                    {
+                        _logger.LogMessage(LogLevel.Warning, "NOT FOUND [Character]: {0}", character);
+                    }
+
                     return;
                 }
 
@@ -126,7 +142,7 @@ namespace FightCore.Bot.Modules
 
                 if (_loggingSettings.Characters)
                 {
-                    _logger.LogMessage("[Character moves]: {0}", characterEntity.Name);
+                    _logger.LogMessage(LogLevel.Information, "[Character moves]: {0}", characterEntity.Name);
                 }
             }
         }
@@ -153,6 +169,12 @@ namespace FightCore.Bot.Modules
                     var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string>()
                         {{"Character", character}});
                     await ReplyAsync("", embed: notFoundEmbed);
+
+                    if (_loggingSettings.Moves)
+                    {
+                        _logger.LogMessage(LogLevel.Warning, "NOT FOUND [Character]: {0}", character);
+                    }
+
                     return;
                 }
 
@@ -164,7 +186,7 @@ namespace FightCore.Bot.Modules
 
                 if (_loggingSettings.Characters)
                 {
-                    _logger.LogMessage("[Character]: {0}", characterEntity.Name);
+                    _logger.LogMessage(LogLevel.Information, "[Character]: {0}", characterEntity.Name);
                 }
             }
         }

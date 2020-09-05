@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Serilog;
 using ILogger = Microsoft.Extensions.Logging.ILogger;
@@ -17,12 +18,12 @@ namespace FightCore.Bot.Services
         private readonly ILogger _discordLogger;
         private readonly ILogger _commandsLogger;
 
-        public LogService(DiscordSocketClient discord, CommandService commands, ILoggerFactory loggerFactory)
+        public LogService(DiscordSocketClient discord, CommandService commands, ILoggerFactory loggerFactory, IConfiguration configuration)
         {
             _discord = discord;
             _commands = commands;
 
-            _loggerFactory = ConfigureLogging(loggerFactory);
+            _loggerFactory = ConfigureLogging(loggerFactory, configuration);
             _discordLogger = _loggerFactory.CreateLogger("discord");
             _commandsLogger = _loggerFactory.CreateLogger("commands");
 
@@ -30,15 +31,15 @@ namespace FightCore.Bot.Services
             _commands.Log += LogCommand;
         }
 
-        public void LogMessage(string message, params object[] args)
+        public void LogMessage(LogLevel logLevel, string message, params object[] args)
         {
-            _commandsLogger.LogInformation(message, args);
+            _commandsLogger.Log(logLevel, message, args);
         }
 
-        private ILoggerFactory ConfigureLogging(ILoggerFactory factory)
+        private ILoggerFactory ConfigureLogging(ILoggerFactory factory, IConfiguration configuration)
         {
             // Add a logger
-            factory.AddSerilog(new LoggerConfiguration().WriteTo.Console().CreateLogger());
+            factory.AddSerilog(new LoggerConfiguration().ReadFrom.Configuration(configuration).CreateLogger());
             return factory;
         }
 
