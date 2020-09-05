@@ -30,6 +30,11 @@ namespace FightCore.Bot.Services
             _commands.Log += LogCommand;
         }
 
+        public void LogMessage(string message, params object[] args)
+        {
+            _commandsLogger.LogInformation(message, args);
+        }
+
         private ILoggerFactory ConfigureLogging(ILoggerFactory factory)
         {
             // Add a logger

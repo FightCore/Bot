@@ -62,6 +62,7 @@ namespace FightCore.Bot
                 .Configure<EmbedSettings>(_config.GetSection("EmbedSettings"))
                 .Configure<ModuleSettings>(_config.GetSection("Modules"))
                 .Configure<CommandSettings>(_config.GetSection("CommandSettings"))
+                .Configure<LoggingSettings>(_config.GetSection("Logging"))
                 .AddScoped<ICharacterService, CharacterService>()
                 .AddScoped<ISlippiPlayerService, SlippiPlayerService>()
                 .AddScoped<CharacterInfoEmbedCreator>()

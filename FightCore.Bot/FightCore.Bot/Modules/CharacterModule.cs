@@ -7,6 +7,7 @@ using FightCore.Bot.EmbedCreators;
 using FightCore.Bot.EmbedCreators.Characters;
 using FightCore.Bot.Helpers;
 using FightCore.Bot.Services;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
 namespace FightCore.Bot.Modules
@@ -20,12 +21,16 @@ namespace FightCore.Bot.Modules
         private readonly CharacterInfoEmbedCreator _characterInfoEmbedCreator;
         private readonly NotFoundEmbedCreator _notFoundEmbedCreator;
         private readonly bool _isEnabled;
+        private readonly LoggingSettings _loggingSettings;
+        private readonly LogService _logger;
 
         public CharacterModule(
             ICharacterService characterService,
             FrameDataService frameDataService,
             CharacterInfoEmbedCreator characterInfoEmbedCreator,
             NotFoundEmbedCreator notFoundEmbedCreator,
+            IOptions<LoggingSettings> loggingSettings,
+            LogService logger,
             IOptions<ModuleSettings> moduleSettings)
         {
             _characterService = characterService;
@@ -33,6 +38,8 @@ namespace FightCore.Bot.Modules
             _characterInfoEmbedCreator = characterInfoEmbedCreator;
             _notFoundEmbedCreator = notFoundEmbedCreator;
             _isEnabled = moduleSettings.Value.Moves;
+            _loggingSettings = loggingSettings.Value;
+            _logger = logger;
         }
 
 
@@ -81,6 +88,10 @@ namespace FightCore.Bot.Modules
                 }
 
                 var embed = _characterInfoEmbedCreator.CreateMoveEmbed(characterEntity, attack, fightCoreCharacter);
+                if (_loggingSettings.Moves)
+                {
+                    _logger.LogMessage("[Character]: {0}, [Move]: {1}", characterEntity.Name, attack.Name);
+                }
 
                 await ReplyAsync(string.Empty, embed: embed);
             }
@@ -112,6 +123,11 @@ namespace FightCore.Bot.Modules
 
                 var embed = _characterInfoEmbedCreator.CreateMoveListEmbed(characterEntity, moves, fightCoreCharacter);
                 await ReplyAsync(string.Empty, embed: embed);
+
+                if (_loggingSettings.Characters)
+                {
+                    _logger.LogMessage("[Character moves]: {0}", characterEntity.Name);
+                }
             }
         }
 
@@ -145,6 +161,11 @@ namespace FightCore.Bot.Modules
                 var embed = _characterInfoEmbedCreator.CreateInfoEmbed(characterEntity, fightCoreCharacter, misc);
 
                 await ReplyAsync(string.Empty, embed: embed);
+
+                if (_loggingSettings.Characters)
+                {
+                    _logger.LogMessage("[Character]: {0}", characterEntity.Name);
+                }
             }
         }
     }
