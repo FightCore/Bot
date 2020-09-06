@@ -54,17 +54,17 @@ namespace FightCore.Bot.EmbedCreators.Base
             switch (EmbedSettings.FooterType)
             {
                 case FooterType.FightCore:
-                    builder.WithFooter($"FightCore Bot Version {version}")
+                    builder.WithFooter($"FightCore Bot Version {version}", "https://i.fightcore.gg/clients/fightcore.png")
                         .WithCurrentTimestamp()
                         .WithColor(Color.Red);
                     break;
                 case FooterType.MeleeOnline:
-                    builder.WithFooter($"Melee Online Frame Data Version {version}", "https://cdn.discordapp.com/icons/724998978113896508/a_a765306c32c21eca27349539154983a9.webp?size=128")
+                    builder.WithFooter($"Melee Online Frame Data Version {version}", "https://i.fightcore.gg/clients/meleeonline.webp")
                         .WithColor(Color.Green)
                         .WithCurrentTimestamp();
                     break;
                 case FooterType.DutchNetplay:
-                    builder.WithFooter($"Dutch Melee Discord Version {version}", "https://cdn.discordapp.com/icons/283580261520769026/df9cab8218c661ebd2ad0c4550969504.webp?size=128")
+                    builder.WithFooter($"Dutch Melee Discord Version {version}", "https://i.fightcore.gg/clients/dutchnetplaydiscord.webp")
                         .WithColor(Color.Red)
                         .WithCurrentTimestamp();
                     break;

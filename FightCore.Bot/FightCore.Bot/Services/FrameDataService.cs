@@ -116,7 +116,7 @@ namespace FightCore.Bot.Services
             var characterEntity = GetCharacter(character);
 
             //==================================
-            // Step 1.5: Get move aliases for specific things like "b" meaning "neutralb".
+            // Step 2: Get move aliases for specific things like "b" meaning "neutralb".
             //==================================
             var alias = _moveAliases.FirstOrDefault(moveAlias =>
                 moveAlias.Alias.Any(storedAlias => storedAlias == normalizedMove));
@@ -124,10 +124,27 @@ namespace FightCore.Bot.Services
             if (alias != null)
             {
                 normalizedMove = alias.Move;
+                move = alias.Move;
             }
 
             //==================================
-            // Step 1.75: Check if the move contains something like "air"
+            // Step 3: Check if the move is a special name like Shine or Knee.
+            //==================================
+            if (characterEntity.Moves?.Any() == true)
+            {
+                var specialMoveName = characterEntity.Moves.FirstOrDefault(storedMove =>
+                    storedMove.Key == normalizedMove);
+
+                // keyValuePairs can not be null, check if its the default.
+                if (!specialMoveName.Equals(default(KeyValuePair<string, string>)))
+                {
+                    normalizedMove = specialMoveName.Value;
+                    move = specialMoveName.Value;
+                }
+            }
+
+            //==================================
+            // Step 3: Check if the move contains something like "air"
             //==================================
             var airAliases = new[] { "(air)", "aerial" };
             foreach (var airAlias in airAliases)
@@ -150,22 +167,7 @@ namespace FightCore.Bot.Services
 
 
             //==================================
-            // Step 2: Check if the move is a special name like Shine or Knee.
-            //==================================
-            if (characterEntity.Moves?.Any() == true)
-            {
-                var specialMoveName = characterEntity.Moves.FirstOrDefault(storedMove =>
-                    storedMove.Key == normalizedMove);
-
-                // keyValuePairs can not be null, check if its the default.
-                if (!specialMoveName.Equals(default(KeyValuePair<string, string>)))
-                {
-                    normalizedMove = specialMoveName.Value;
-                }
-            }
-
-            //==================================
-            // Step 3: Look for the move/attack directly using no search optimizations.
+            // Step 4: Look for the move/attack directly using no search optimizations.
             //==================================
             var moveEntity = _entities.FirstOrDefault(attack =>
                 attack.NormalizedCharacter == characterEntity.NormalizedName
@@ -179,7 +181,7 @@ namespace FightCore.Bot.Services
             }
 
             //==================================
-            // Step 4: Look for the move/attack in the fancy move name.
+            // Step 5: Look for the move/attack in the fancy move name.
             //==================================
             moveEntity = _entities.FirstOrDefault(attack =>
                 attack.NormalizedCharacter == characterEntity.NormalizedName
@@ -191,7 +193,7 @@ namespace FightCore.Bot.Services
             }
 
             //==================================
-            // Step 5: Get all attacks for a character and search for a move using algorithms.
+            // Step 6: Get all attacks for a character and search for a move using algorithms.
             // Most notably levenshtein distance filtering out the small spelling errors like "faii" instead of "fair".
             //==================================
             var moves = _entities.Where(attack =>
