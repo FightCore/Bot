@@ -47,33 +47,29 @@ namespace FightCore.Bot.EmbedCreators.Base
             return true;
         }
 
-        protected EmbedBuilder AddFightCoreFooter(EmbedBuilder embedBuilder)
-        {
-            return embedBuilder.WithFooter("Visit us at www.FightCore.gg")
-                .WithCurrentTimestamp()
-                .WithColor(Color.Red);
-        }
-
 
         protected EmbedBuilder AddFooter(EmbedBuilder builder)
         {
+            const string version = "v1.0.3 DEV";
             switch (EmbedSettings.FooterType)
             {
                 case FooterType.FightCore:
-                    builder = AddFightCoreFooter(builder);
+                    builder.WithFooter($"FightCore Bot Version {version}")
+                        .WithCurrentTimestamp()
+                        .WithColor(Color.Red);
                     break;
                 case FooterType.MeleeOnline:
-                    builder.WithFooter("Melee Online Frame Data", "https://cdn.discordapp.com/icons/724998978113896508/a_a765306c32c21eca27349539154983a9.webp?size=128")
+                    builder.WithFooter($"Melee Online Frame Data Version {version}", "https://cdn.discordapp.com/icons/724998978113896508/a_a765306c32c21eca27349539154983a9.webp?size=128")
                         .WithColor(Color.Green)
                         .WithCurrentTimestamp();
                     break;
                 case FooterType.DutchNetplay:
-                    builder.WithFooter("Dutch Melee Discord", "https://cdn.discordapp.com/icons/283580261520769026/df9cab8218c661ebd2ad0c4550969504.webp?size=128")
+                    builder.WithFooter($"Dutch Melee Discord Version {version}", "https://cdn.discordapp.com/icons/283580261520769026/df9cab8218c661ebd2ad0c4550969504.webp?size=128")
                         .WithColor(Color.Red)
                         .WithCurrentTimestamp();
                     break;
                 case FooterType.MeleeNewbieNetplay:
-                    builder.WithFooter("Newbie Netplay Frame Data", "https://i.fightcore.gg/clients/newbienetplaysmash.png")
+                    builder.WithFooter($"Newbie Netplay Frame Data Version {version}", "https://i.fightcore.gg/clients/newbienetplaysmash.png")
                         .WithColor(Color.Red)
                         .WithCurrentTimestamp();
                     break;

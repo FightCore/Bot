@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using FightCore.Bot.Configuration;
+using FightCore.Bot.Modules;
 using Microsoft.Extensions.Options;
 
 namespace FightCore.Bot.Services
@@ -15,26 +17,41 @@ namespace FightCore.Bot.Services
         private readonly CommandService _commands;
         private IServiceProvider _provider;
         private readonly CommandSettings _settings;
+        private readonly ModuleSettings _moduleSettings;
+
+        private readonly Dictionary<string, Type> _moduleDictionary = new Dictionary<string, Type>()
+        {
+            {nameof(ModuleSettings.Moves), typeof(CharacterModule)},
+            {nameof(ModuleSettings.SlippiStats), typeof(SlippiModule)},
+            {nameof(ModuleSettings.Tournaments), typeof(TournamentModule)}
+        };
 
         public CommandHandlingService(
             IServiceProvider provider,
             DiscordSocketClient discord,
             CommandService commands,
+            IOptions<ModuleSettings> moduleOptions,
             IOptions<CommandSettings> commandSettings)
         {
             _discord = discord;
             _commands = commands;
             _provider = provider;
             _settings = commandSettings.Value;
-
+            _moduleSettings = moduleOptions.Value;
             _discord.MessageReceived += MessageReceived;
         }
 
         public async Task InitializeAsync(IServiceProvider provider)
         {
             _provider = provider;
-            await _commands.AddModulesAsync(Assembly.GetEntryAssembly(), provider);
-            // Add additional initialization code here...
+            if (_moduleSettings.SlippiStats) await AddModule(nameof(_moduleSettings.SlippiStats));
+            if (_moduleSettings.Moves) await AddModule(nameof(_moduleSettings.Moves));
+            if (_moduleSettings.Tournaments) await AddModule(nameof(_moduleSettings.Tournaments));
+        }
+
+        private async Task AddModule(string module)
+        {
+            await _commands.AddModuleAsync(_moduleDictionary[module], _provider);
         }
 
         private async Task MessageReceived(SocketMessage rawMessage)

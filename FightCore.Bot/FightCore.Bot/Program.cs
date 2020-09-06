@@ -52,7 +52,6 @@ namespace FightCore.Bot
                 // Base
                 .AddSingleton(_client)
                 .AddSingleton<CommandService>()
-                .AddSingleton<CommandHandlingService>()
                 // Logging
                 .AddLogging()
                 .AddSingleton<LogService>()
@@ -69,6 +68,7 @@ namespace FightCore.Bot
                 .AddScoped<NotFoundEmbedCreator>()
                 .AddScoped<PlayerEmbedCreator>()
                 // Add additional services here...
+                .AddSingleton<CommandHandlingService>()
                 .BuildServiceProvider();
         }
 

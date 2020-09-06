@@ -16,7 +16,7 @@ namespace FightCore.Bot.EmbedCreators.Slippi
         public Embed CreatePlayerEmbed(PlayerResult player)
         {
             var embedBuilder = new EmbedBuilder();
-            embedBuilder = AddFightCoreFooter(embedBuilder);
+            embedBuilder = AddFooter(embedBuilder);
             embedBuilder.AddField("Source", "Statistics by https://slippistats.online");
             embedBuilder = CreatePlayerStats(embedBuilder, player.Player);
             return embedBuilder.Build();
@@ -25,7 +25,7 @@ namespace FightCore.Bot.EmbedCreators.Slippi
         public Embed CreateVsEmbed(PlayerResult player)
         {
             var embedBuilder = new EmbedBuilder();
-            embedBuilder = AddFightCoreFooter(embedBuilder);
+            embedBuilder = AddFooter(embedBuilder);
             embedBuilder = CreatePlayerStats(embedBuilder, player.Player);
             embedBuilder = CreatePlayerStats(embedBuilder, player.Opponent);
             embedBuilder.AddField("Source", "Statistics by https://slippistats.online");
