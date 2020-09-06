@@ -2,7 +2,26 @@
   {
     "move": "neutralb",
     "alias": [
-      "b"
+      "b",
+      "neutralspecial"
+    ]
+  },
+  {
+    "move": "sideb",
+    "alias": [
+      "sidespecial"
+    ]
+  },
+  {
+    "move": "dowmb",
+    "alias": [
+      "downspecial"
+    ]
+  },
+  {
+    "move": "upb",
+    "alias": [
+      "upspecial"
     ]
   },
   {
@@ -23,6 +42,6 @@
     "alias": [
       "broll",
       "backwardroll"
-    ] 
+    ]
   }
 ]

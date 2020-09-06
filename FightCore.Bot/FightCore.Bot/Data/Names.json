@@ -42,7 +42,9 @@
     ],
     "Moves": {
       "laser": "neutralb",
-      "shine": "downb" 
+      "shine": "downb",
+      "aerialblaster": "aerial neutralb",
+      "aeriallaser": "aerial neutralb"
     },
     "FightCoreId": 218
   },
@@ -54,7 +56,9 @@
     "FightCoreId": 224,
     "Moves": {
       "shine": "downb",
-      "laser":  "neutralb" 
+      "laser": "neutralb",
+      "aerialblaster": "aerial neutralb",
+      "aeriallaser": "aerial neutralb"
     }
   },
   {
@@ -214,7 +218,9 @@
     "Names": [
       "young link",
       "ylink",
-      "yink"
+      "yink",
+      "yl",
+      "young"
     ],
     "FightCoreId": 220
   }
