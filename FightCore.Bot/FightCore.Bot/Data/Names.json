@@ -213,6 +213,9 @@
     "Names": [
       "sheik"
     ],
+    "Moves": {
+      "boostgrab": "dashgrab" 
+    },
     "FightCoreId": 260
   },
   {
