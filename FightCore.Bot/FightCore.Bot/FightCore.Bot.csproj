@@ -13,6 +13,7 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="3.1.7" />
     <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="3.1.7" />
     <PackageReference Include="Microsoft.Extensions.Logging.Console" Version="3.1.7" />
+    <PackageReference Include="MiniProfiler.AspNetCore" Version="4.2.1" />
     <PackageReference Include="Serilog" Version="2.9.0" />
     <PackageReference Include="Serilog.Extensions.Logging" Version="3.0.1" />
     <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
@@ -23,6 +24,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FightCore.Api\FightCore.Api.csproj" />
+    <ProjectReference Include="..\FightCore.FrameData\FightCore.FrameData.csproj" />
     <ProjectReference Include="..\FightCore.MeleeFrameData\FightCore.MeleeFrameData.csproj" />
     <ProjectReference Include="..\FightCore.SlippiStatsOnline\FightCore.SlippiStatsOnline.csproj" />
   </ItemGroup>

@@ -10,6 +10,7 @@ using FightCore.Bot.Helpers;
 using FightCore.Bot.Models.FrameData;
 using FightCore.MeleeFrameData;
 using Microsoft.Extensions.Options;
+using Move = FightCore.FrameData.Models.Move;
 
 namespace FightCore.Bot.EmbedCreators.Characters
 {
@@ -62,19 +63,71 @@ namespace FightCore.Bot.EmbedCreators.Characters
             return embedBuilder.Build();
         }
 
-        public Embed CreateMoveEmbed(WrapperCharacter character, NormalizedEntity move, Character fightCoreCharacter)
+        public Embed CreateMoveEmbed(WrapperCharacter character, Move move, Character fightCoreCharacter)
         {
-            return move switch
+            var embedBuilder = CreateDefaultFrameDataEmbed(character, move, fightCoreCharacter);
+
+            var frameDataBuilder = new StringBuilder();
+            AddIfPossible("Total frames", move.TotalFrames, frameDataBuilder);
+            if (move.Start.HasValue && move.End.HasValue)
             {
-                Attack attack => CreateAttackEmbed(character, attack, fightCoreCharacter),
-                Dodge dodge => CreateDodgeEmbed(character, dodge, fightCoreCharacter),
-                Grab grab => CreateGrabEmbed(character, grab, fightCoreCharacter),
-                Throw @throw => CreateThrowEmbed(character, @throw, fightCoreCharacter),
-                _ => throw new NotImplementedException()
-            };
+                AddString("Hit", $"{move.Start} - {move.End}", frameDataBuilder);
+            }
+            else if (move.Start.HasValue)
+            {
+                AddIfPossible("Hit start", move.Start, frameDataBuilder);
+            }
+            else if (move.End.HasValue)
+            {
+                AddIfPossible("Hit end", move.End, frameDataBuilder);
+            }
+
+            AddIfPossible("IASA", move.IASA, frameDataBuilder);
+            AddIfPossible("Land lag", move.LandLag, frameDataBuilder);
+            AddIfPossible("L-Canceled", move.LCanceledLandLag, frameDataBuilder);
+
+            if (move.AutoCancelBefore.HasValue && move.AutoCancelAfter.HasValue && move.AutoCancelBefore > -1 && move.AutoCancelAfter > -1)
+            {
+                frameDataBuilder.AppendLine($"**Won't Auto Cancel:** {move.AutoCancelBefore}-{move.AutoCancelAfter}");
+            }
+
+            AddString("Notes", move.Notes, frameDataBuilder);
+            frameDataBuilder.AppendLine("Data by https://www.meleeframedata.com");
+
+            if (!string.IsNullOrWhiteSpace(frameDataBuilder.ToString()))
+            {
+                embedBuilder.AddField("Frame Data", frameDataBuilder.ToString(), true);
+            }
+
+            var hitboxStringBuilder = AddHitboxDataToEmbedBuilder(move);
+            if (!string.IsNullOrWhiteSpace(hitboxStringBuilder.ToString()))
+            {
+                hitboxStringBuilder.AppendLine();
+                hitboxStringBuilder.AppendLine("Hitbox data by https://www.ikneedata.com");
+                hitboxStringBuilder.AppendLine("Colored hitboxes follow the following rules:");
+                hitboxStringBuilder.AppendLine("id0=Red, id1=Green, id2=Purple, id3=Orange");
+                hitboxStringBuilder.AppendLine("Credits to 20XX for the code and MWStage for the colored GIFs");
+                embedBuilder.AddField("Hitbox summary", hitboxStringBuilder.ToString());
+            }
+
+            return embedBuilder.Build();
         }
 
-        public Embed CreateMoveListEmbed(WrapperCharacter character, List<NormalizedEntity> moves, Character fightCoreCharacter)
+        private StringBuilder AddHitboxDataToEmbedBuilder(Move move)
+        {
+            var hitboxSummary = new StringBuilder();
+            AddString("Name", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Name)), hitboxSummary);
+            AddString("Damage", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Damage)), hitboxSummary);
+            AddString("Effect", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Effect)), hitboxSummary);
+            AddString("Angle", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Angle)), hitboxSummary);
+            AddString("Base knockback", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.BaseKnockback)), hitboxSummary);
+            AddString("Kockback growth", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.KnockbackGrowth)), hitboxSummary);
+            AddString("Set knockback", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.SetKnockback)), hitboxSummary);
+
+            return hitboxSummary;
+        }
+
+        public Embed CreateMoveListEmbed(WrapperCharacter character, List<Move> moves, Character fightCoreCharacter)
         {
             var embedBuilder = new EmbedBuilder();
             embedBuilder.WithUrl($"http://meleeframedata.com/{character.NormalizedName}");
@@ -86,8 +139,8 @@ namespace FightCore.Bot.EmbedCreators.Characters
 
             embedBuilder.AddField("Moves", ShortenField(
                 string.Join(", ", moves.Select(move => move.Name))))
-                .AddField("Help", "To check out a move use:\n`" + _prefix + "character move {CHARACTER NAME} {MOVE NAME}`\n" +
-                                          "For example: `" + _prefix + "character move Fox u-smash`");
+                .AddField("Help", "To check out a move use:\n`" + _prefix + "character {CHARACTER NAME} {MOVE NAME}`\n" +
+                                          "For example: `" + _prefix + "character Fox u-smash`");
 
             embedBuilder = AddFooter(embedBuilder);
             return embedBuilder.Build();
@@ -100,8 +153,6 @@ namespace FightCore.Bot.EmbedCreators.Characters
             embedBuilder.AddField("Character statistics",
                 "`" + _prefix + "c {{NAME}}`\n" +
                 "Use this command to get information about a character " +
-                "Note that character names with spaces need to have quotes, " +
-                "`" + _prefix + "c \"Ice climbers\"`. Most of these names can shortened (Ice Climbers = ics)\n" +
                 "Example: `" + _prefix + "c Kirby`");
             embedBuilder.AddField("Move list",
                 "`" + _prefix + "c moves {{NAME}}`\n" +
@@ -118,102 +169,13 @@ namespace FightCore.Bot.EmbedCreators.Characters
             return embedBuilder.Build();
         }
 
-        private Embed CreateAttackEmbed(WrapperCharacter character, Attack move, Character fightCoreCharacter)
-        {
-            var embedBuilder = CreateDefaultFrameDataEmbed(character, move, fightCoreCharacter);
-
-            var frameDataBuilder = new StringBuilder();
-            AddIfPossible("Total frames", move.Total, frameDataBuilder);
-            AddIfPossible("Hit start", move.Start, frameDataBuilder);
-            AddIfPossible("Hit end", move.End, frameDataBuilder);
-            AddIfPossible("Shield stun", move.Stun, frameDataBuilder);
-            AddIfPossible("Percent", move.Percent, frameDataBuilder);
-            AddIfPossible("Percent (weak hit)", move.PercentWeak, frameDataBuilder);
-            AddIfPossible("IASA", move.Iasa, frameDataBuilder);
-
-            if (move.AutoCancelStart.HasValue && move.AutoCancelEnd.HasValue && move.AutoCancelStart > -1 && move.AutoCancelEnd > -1)
-            {
-                frameDataBuilder.AppendLine($"**Won't Auto Cancel:** {move.AutoCancelStart}-{move.AutoCancelEnd}");
-            }
-
-            AddIfPossible("Land lag", move.LandingLag, frameDataBuilder);
-            AddIfPossible("L-Canceled", move.LCanceledLandingLag, frameDataBuilder);
-
-            if (!string.IsNullOrWhiteSpace(move.Notes))
-            {
-                frameDataBuilder.AppendLine($"**Notes:** {move.Notes}");
-            }
-
-            embedBuilder.AddField("Frame Data", frameDataBuilder.ToString(), true);
-
-
-            embedBuilder = AddMeleeFrameDataInfo(embedBuilder);
-
-            return embedBuilder.Build();
-        }
-
-        private Embed CreateDodgeEmbed(WrapperCharacter character, Dodge dodge, Character fightCoreCharacter)
-        {
-            var embedBuilder = CreateDefaultFrameDataEmbed(character, dodge, fightCoreCharacter);
-            var frameDataBuilder = new StringBuilder();
-            AddIfPossible("Start", dodge.Start, frameDataBuilder);
-            AddIfPossible("Invulnerable ends", dodge.EndInvulnerable, frameDataBuilder);
-            AddIfPossible("Total", dodge.Total, frameDataBuilder);
-
-            embedBuilder.AddField("Frame data", frameDataBuilder.ToString());
-
-            embedBuilder = AddMeleeFrameDataInfo(embedBuilder);
-            return embedBuilder.Build();
-        }
-
-        private Embed CreateGrabEmbed(WrapperCharacter character, Grab grab, Character fightCoreCharacter)
-        {
-            var embedBuilder = CreateDefaultFrameDataEmbed(character, grab, fightCoreCharacter);
-
-
-            var frameDataBuilder = new StringBuilder();
-            AddIfPossible("Start", grab.Start, frameDataBuilder);
-            AddIfPossible("End", grab.End, frameDataBuilder);
-            AddIfPossible("Total", grab.Total, frameDataBuilder);
-            embedBuilder.AddField("Frame data", frameDataBuilder.ToString());
-
-            if (!string.IsNullOrWhiteSpace(grab.Notes))
-            {
-                embedBuilder.AddField("Notes", grab.Notes, true);
-            }
-
-            embedBuilder = AddMeleeFrameDataInfo(embedBuilder);
-            return embedBuilder.Build();
-        }
-
-        private Embed CreateThrowEmbed(WrapperCharacter character, Throw throwMove, Character fightCoreCharacter)
-        {
-            var embedBuilder = CreateDefaultFrameDataEmbed(character, throwMove, fightCoreCharacter);
-
-
-            var frameDataBuilder = new StringBuilder();
-            AddIfPossible("Start", throwMove.Start, frameDataBuilder);
-            AddIfPossible("End", throwMove.End, frameDataBuilder);
-            AddIfPossible("Total", throwMove.Total, frameDataBuilder);
-            AddIfPossible("Percent", throwMove.Percent, frameDataBuilder);
-            embedBuilder.AddField("Frame data", frameDataBuilder.ToString());
-
-            if (!string.IsNullOrWhiteSpace(throwMove.Notes))
-            {
-                embedBuilder.AddField("Notes", throwMove.Notes, true);
-            }
-
-            embedBuilder = AddMeleeFrameDataInfo(embedBuilder);
-            return embedBuilder.Build();
-        }
-
-        private EmbedBuilder CreateDefaultFrameDataEmbed(WrapperCharacter character, NormalizedEntity move,
+        private EmbedBuilder CreateDefaultFrameDataEmbed(WrapperCharacter character, Move move,
             Character fightCoreCharacter)
         {
-            var characterName = SearchHelper.Normalize(move.Character);
-            var moveName = SearchHelper.Normalize(move.NormalizedType);
+            var characterName = SearchHelper.Normalize(character.NormalizedName);
+            var moveName = SearchHelper.Normalize(move.NormalizedName);
             var embedBuilder = new EmbedBuilder()
-                .WithUrl($"http://meleeframedata.com/{move.Character}")
+                .WithUrl($"http://meleeframedata.com/{characterName}")
                 .WithImageUrl($"https://i.fightcore.gg/melee/moves/{characterName}/{moveName}.gif");
 
             if (fightCoreCharacter != null)
@@ -224,13 +186,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             embedBuilder.Title = $"{character.Name} - {move.Name}";
             return AddFooter(embedBuilder);
         }
-
-        private static EmbedBuilder AddMeleeFrameDataInfo(EmbedBuilder builder)
-        {
-            return builder.AddField("Melee Frame Data",
-                "All of this data is provided by http://meleeframedata.com.");
-        }
-
+        
         private static void AddIfPossible(string key, int? value, StringBuilder stringBuilder)
         {
             if (!value.HasValue || value <= 0)
@@ -239,6 +195,16 @@ namespace FightCore.Bot.EmbedCreators.Characters
             }
 
             stringBuilder.Append($"**{key}:** {value}\n");
+        }
+
+        private static void AddString(string key, string value, StringBuilder stringBuilder)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+
+            stringBuilder.AppendLine($"**{key}:** {value}");
         }
     }
 }

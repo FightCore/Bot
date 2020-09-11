@@ -16,6 +16,9 @@
       "cp",
       "cpt"
     ],
+    "Moves": {
+      "knee":  "fair" 
+    },
     "FightCoreId": 227
   },
   {
@@ -34,7 +37,8 @@
       "doctormario"
     ],
     "Moves": {
-      "pill": "neutralb"
+      "pill": "neutralb",
+      "cape": "sideb" 
     },
     "FightCoreId": 215
   },

@@ -7,7 +7,7 @@ namespace FightCore.Bot.Helpers
     {
         public static string Normalize(string value)
         {
-            var removedChars = new string[] {"-", "_", ".", "@", "`", " ", "(", ")"};
+            var removedChars = new string[] {"-", "_", ".", "@", "`", "\"", " ", "(", ")"};
 
             value = removedChars.
                 Aggregate(value, (current, removedChar) =>
