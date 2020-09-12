@@ -44,6 +44,7 @@ namespace FightCore.Bot.Services
         public async Task InitializeAsync(IServiceProvider provider)
         {
             _provider = provider;
+            await _commands.AddModuleAsync(typeof(HelpModule), _provider);
             if (_moduleSettings.SlippiStats) await AddModule(nameof(_moduleSettings.SlippiStats));
             if (_moduleSettings.Moves) await AddModule(nameof(_moduleSettings.Moves));
             if (_moduleSettings.Tournaments) await AddModule(nameof(_moduleSettings.Tournaments));

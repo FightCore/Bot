@@ -139,8 +139,8 @@ namespace FightCore.Bot.EmbedCreators.Characters
 
             embedBuilder.AddField("Moves", ShortenField(
                 string.Join(", ", moves.Select(move => move.Name))))
-                .AddField("Help", "To check out a move use:\n`" + _prefix + "character {CHARACTER NAME} {MOVE NAME}`\n" +
-                                          "For example: `" + _prefix + "character Fox u-smash`");
+                .AddField("Help", "To check out a move use:\n`" + _prefix + "c {CHARACTER NAME} {MOVE NAME}`\n" +
+                                          "For example: `" + _prefix + "c Fox u-smash`");
 
             embedBuilder = AddFooter(embedBuilder);
             return embedBuilder.Build();
@@ -152,18 +152,17 @@ namespace FightCore.Bot.EmbedCreators.Characters
             embedBuilder.WithTitle("Help");
             embedBuilder.AddField("Character statistics",
                 "`" + _prefix + "c {{NAME}}`\n" +
-                "Use this command to get information about a character " +
+                "Use this command to get information about a character.\n" +
                 "Example: `" + _prefix + "c Kirby`");
             embedBuilder.AddField("Move list",
-                "`" + _prefix + "c moves {{NAME}}`\n" +
+                "`" + _prefix + "c {{NAME}} moves`\n" +
                 "Use this command to get a list of moves that are available for that character. " +
                 "Note that the special move names can also be shortened to their input (Fox Blaster = neutral b).\n" +
-                "Example: `" + _prefix + "c moves g&w`");
+                "Example: `" + _prefix + "c g&w moves`");
             embedBuilder.AddField("Move frame data",
-                "`" + _prefix + "c m {{CHARACTER}} {{MOVE}}`\n" +
-                "Use this command to get the frame data about a move, note that character can only be one word here!" +
-                " Shorten your character names to make them fit (Ice Climbers = ics)\n" +
-                "Example: `" + _prefix + "c m falcon u-tilt`");
+                "`" + _prefix + "c {{CHARACTER}} {{MOVE}}`\n" +
+                "Gets the frame and hitbox data from a specific character and move.\n" +
+                "Example: `" + _prefix + "c Captain Falcon u-tilt`");
             embedBuilder = AddFooter(embedBuilder);
 
             return embedBuilder.Build();

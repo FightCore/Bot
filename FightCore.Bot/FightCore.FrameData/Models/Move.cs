@@ -12,6 +12,8 @@ namespace FightCore.FrameData.Models
 
         public string NormalizedName { get; set; }
 
+        public string NormalizedMoveName { get; set; }
+
         public List<Hitbox> Hitboxes { get; set; }
 
         #region Land lag

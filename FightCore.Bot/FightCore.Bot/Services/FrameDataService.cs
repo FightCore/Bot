@@ -28,6 +28,14 @@ namespace FightCore.Bot.Services
             var moveService = new MoveService();
             _frameDataCharacters = moveService.GetCharacters().GetAwaiter().GetResult();
 
+            foreach (var frameDataCharacter in _frameDataCharacters)
+            {
+                foreach (var move in frameDataCharacter.Moves)
+                {
+                    move.NormalizedMoveName = SearchHelper.Normalize(move.Name);
+                }
+            }
+
             foreach (var wrapperCharacter in _characters)
             {
                 wrapperCharacter.NormalizedName = SearchHelper.Normalize(wrapperCharacter.Name);
@@ -158,7 +166,8 @@ namespace FightCore.Bot.Services
             moveEntity = characterEntity.Moves.FirstOrDefault(attack => 
                 attack.Name.Equals(normalizedMove, StringComparison.InvariantCultureIgnoreCase)
                 || attack.Name.Contains(normalizedMove, StringComparison.InvariantCultureIgnoreCase)
-                || attack.Name.Contains(move, StringComparison.InvariantCultureIgnoreCase));
+                || attack.Name.Contains(move, StringComparison.InvariantCultureIgnoreCase)
+                || attack.NormalizedMoveName.Contains(move, StringComparison.InvariantCultureIgnoreCase));
 
             if (moveEntity != null)
             {
