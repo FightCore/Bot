@@ -92,7 +92,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             }
 
             AddString("Notes", move.Notes, frameDataBuilder);
-            frameDataBuilder.AppendLine("Data by https://www.meleeframedata.com");
+            frameDataBuilder.AppendLine("Data by http://www.meleeframedata.com");
 
             if (!string.IsNullOrWhiteSpace(frameDataBuilder.ToString()))
             {
