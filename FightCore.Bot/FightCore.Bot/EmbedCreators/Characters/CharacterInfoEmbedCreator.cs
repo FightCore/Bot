@@ -121,7 +121,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             AddString("Effect", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Effect)), hitboxSummary);
             AddString("Angle", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Angle)), hitboxSummary);
             AddString("Base knockback", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.BaseKnockback)), hitboxSummary);
-            AddString("Kockback growth", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.KnockbackGrowth)), hitboxSummary);
+            AddString("Knockback growth", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.KnockbackGrowth)), hitboxSummary);
             AddString("Set knockback", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.SetKnockback)), hitboxSummary);
 
             return hitboxSummary;
