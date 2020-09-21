@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Discord;
-using FightCore.Api.Models;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators.Base;
 using FightCore.Bot.Helpers;
 using FightCore.Bot.Models.FrameData;
+using FightCore.FrameData.Models;
 using FightCore.MeleeFrameData;
 using Microsoft.Extensions.Options;
+using Character = FightCore.Api.Models.Character;
 using Move = FightCore.FrameData.Models.Move;
 
 namespace FightCore.Bot.EmbedCreators.Characters
@@ -123,6 +124,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             AddString("Base knockback", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.BaseKnockback)), hitboxSummary);
             AddString("Knockback growth", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.KnockbackGrowth)), hitboxSummary);
             AddString("Set knockback", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.SetKnockback)), hitboxSummary);
+            AddString("Shieldstun", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Shieldstun)), hitboxSummary);
 
             return hitboxSummary;
         }
@@ -136,10 +138,15 @@ namespace FightCore.Bot.EmbedCreators.Characters
                 embedBuilder.WithThumbnailUrl(fightCoreCharacter.StockIcon.Url.Replace(" ", "+"));
             }
             embedBuilder.Title = $"{character.Name} - Moves";
+            var groupedMoves = moves.GroupBy(move => move.Type)
+                .OrderBy(move => move.Key);
 
-            embedBuilder.AddField("Moves", ShortenField(
-                string.Join(", ", moves.Select(move => move.Name))))
-                .AddField("Help", "To check out a move use:\n`" + _prefix + "c {CHARACTER NAME} {MOVE NAME}`\n" +
+            foreach (var type in groupedMoves)
+            {
+                embedBuilder.AddField(type.Key.ToString(),
+                    ShortenField(string.Join(", ", type.Select(move => move.Name))), type.Key != MoveType.Unknown);
+            }
+            embedBuilder.AddField("Help", "To check out a move use:\n`" + _prefix + "c {CHARACTER NAME} {MOVE NAME}`\n" +
                                           "For example: `" + _prefix + "c Fox u-smash`");
 
             embedBuilder = AddFooter(embedBuilder);
@@ -163,6 +170,8 @@ namespace FightCore.Bot.EmbedCreators.Characters
                 "`" + _prefix + "c {{CHARACTER}} {{MOVE}}`\n" +
                 "Gets the frame and hitbox data from a specific character and move.\n" +
                 "Example: `" + _prefix + "c Captain Falcon u-tilt`");
+            embedBuilder.AddField("Discord",
+                "For further help and reporting bugs, visit our discord at http://discord.fightcore.gg");
             embedBuilder = AddFooter(embedBuilder);
 
             return embedBuilder.Build();

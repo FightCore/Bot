@@ -150,7 +150,7 @@ namespace FightCore.Bot.Services
             //==================================
             // Step 4: Look for the move/attack directly using no search optimizations.
             //==================================
-            var moveEntity = characterEntity.Moves.FirstOrDefault(attack => 
+            var moveEntity = characterEntity.Moves.FirstOrDefault(attack =>
                              attack.NormalizedName == normalizedMove);
 
             // If found, just return it.
@@ -163,11 +163,21 @@ namespace FightCore.Bot.Services
             //==================================
             // Step 5: Look for the move/attack in the fancy move name.
             //==================================
-            moveEntity = characterEntity.Moves.FirstOrDefault(attack => 
+            moveEntity = characterEntity.Moves.FirstOrDefault(attack =>
                 attack.Name.Equals(normalizedMove, StringComparison.InvariantCultureIgnoreCase)
                 || attack.Name.Contains(normalizedMove, StringComparison.InvariantCultureIgnoreCase)
                 || attack.Name.Contains(move, StringComparison.InvariantCultureIgnoreCase)
+                || attack.NormalizedMoveName.Contains(SearchHelper.NormalizeKeepSpace(move),
+                    StringComparison.InvariantCultureIgnoreCase)
                 || attack.NormalizedMoveName.Contains(move, StringComparison.InvariantCultureIgnoreCase));
+
+
+            if (moveEntity == null && move.Contains(" "))
+            {
+                var moveSegments = SearchHelper.NormalizeKeepSpace(move).Split(" ");
+                moveEntity = characterEntity.Moves.FirstOrDefault(attack =>
+                    moveSegments.All(segment => attack.Name.Contains(segment, StringComparison.InvariantCultureIgnoreCase)));
+            }
 
             if (moveEntity != null)
             {

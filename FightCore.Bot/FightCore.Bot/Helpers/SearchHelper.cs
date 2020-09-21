@@ -15,6 +15,16 @@ namespace FightCore.Bot.Helpers
 
             return value.ToLower().Trim();
         }
+        public static string NormalizeKeepSpace(string value)
+        {
+            var removedChars = new string[] { "-", "_", ".", "@", "`", "\"", "(", ")" };
+
+            value = removedChars.
+                Aggregate(value, (current, removedChar) =>
+                    current.Replace(removedChar, string.Empty));
+
+            return value.ToLower().Trim();
+        }
 
         public static string FindMatch(ICollection<string> collection, string value)
         {
