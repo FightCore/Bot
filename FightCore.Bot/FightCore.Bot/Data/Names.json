@@ -91,7 +91,8 @@
     "Names": [
       "jigglypuff",
       "jiggs",
-      "puff"
+      "puff",
+      "purin"
     ],
     "FightCoreId": 214
   },
@@ -215,7 +216,8 @@
   {
     "Name": "Sheik",
     "Names": [
-      "sheik"
+      "sheik",
+      "shiek"
     ],
     "Moves": {
       "boostgrab": "dashgrab" 
