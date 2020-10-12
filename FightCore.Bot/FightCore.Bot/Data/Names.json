@@ -239,5 +239,14 @@
       "young"
     ],
     "FightCoreId": 220
+  },
+  {
+    "Name": "F-Wireframe",
+    "Names": [
+      "fwireframe",
+      "female",
+      "femalewireframe"
+    ],
+    "FightCoreId": -1
   }
 ]

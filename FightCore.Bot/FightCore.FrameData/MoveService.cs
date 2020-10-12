@@ -17,7 +17,7 @@ namespace FightCore.FrameData
 
         public MoveService()
         {
-            _client = new RestClient("https://api.fightcore.gg");
+            _client = new RestClient("https://localhost:5001");
         }
 
         public async Task<List<Character>> GetCharacters()

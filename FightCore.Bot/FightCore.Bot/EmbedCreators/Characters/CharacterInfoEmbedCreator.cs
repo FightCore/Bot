@@ -93,7 +93,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             }
 
             AddString("Notes", move.Notes, frameDataBuilder);
-            frameDataBuilder.AppendLine("Data by http://www.meleeframedata.com");
+            AddString("Source", "http://www.meleeframedata.com", frameDataBuilder);
 
             if (!string.IsNullOrWhiteSpace(frameDataBuilder.ToString()))
             {
@@ -103,11 +103,9 @@ namespace FightCore.Bot.EmbedCreators.Characters
             var hitboxStringBuilder = AddHitboxDataToEmbedBuilder(move);
             if (!string.IsNullOrWhiteSpace(hitboxStringBuilder.ToString()))
             {
-                hitboxStringBuilder.AppendLine();
-                hitboxStringBuilder.AppendLine("Hitbox data by https://www.ikneedata.com");
-                hitboxStringBuilder.AppendLine("Colored hitboxes follow the following rules:");
+                AddString("Source", "https://www.ikneedata.com", hitboxStringBuilder);
                 hitboxStringBuilder.AppendLine("id0=Red, id1=Green, id2=Purple, id3=Orange");
-                hitboxStringBuilder.AppendLine("Credits to 20XX for the code and MWStage for the colored GIFs");
+                hitboxStringBuilder.AppendLine("Credits to MWStage for the colored GIFs");
                 embedBuilder.AddField("Hitbox summary", hitboxStringBuilder.ToString());
             }
 
@@ -186,7 +184,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
                 .WithUrl($"http://meleeframedata.com/{characterName}")
                 .WithImageUrl($"https://i.fightcore.gg/melee/moves/{characterName}/{moveName}.gif");
 
-            if (fightCoreCharacter != null)
+            if (fightCoreCharacter?.StockIcon != null)
             {
                 embedBuilder.WithThumbnailUrl(fightCoreCharacter.StockIcon.Url.Replace(" ", "+"));
             }

@@ -18,6 +18,7 @@ namespace FightCore.Bot.Services
         private IServiceProvider _provider;
         private readonly CommandSettings _settings;
         private readonly ModuleSettings _moduleSettings;
+        private readonly FailedMessageService _failedMessageService;
 
         private readonly Dictionary<string, Type> _moduleDictionary = new Dictionary<string, Type>()
         {
@@ -31,7 +32,8 @@ namespace FightCore.Bot.Services
             DiscordSocketClient discord,
             CommandService commands,
             IOptions<ModuleSettings> moduleOptions,
-            IOptions<CommandSettings> commandSettings)
+            IOptions<CommandSettings> commandSettings,
+            FailedMessageService failedMessageService)
         {
             _discord = discord;
             _commands = commands;
@@ -39,6 +41,50 @@ namespace FightCore.Bot.Services
             _settings = commandSettings.Value;
             _moduleSettings = moduleOptions.Value;
             _discord.MessageReceived += MessageReceived;
+            _discord.MessageUpdated += DiscordOnMessageUpdated;
+            _failedMessageService = failedMessageService;
+        }
+
+        private async Task DiscordOnMessageUpdated(Cacheable<IMessage, ulong> originalMessage, SocketMessage socketMessage, ISocketMessageChannel channel)
+        {
+            var botMessage = _failedMessageService.GetMessageIdForEditMessage(originalMessage.Id);
+            if (botMessage == null)
+            {
+                return;
+            }
+
+            if (!(socketMessage is SocketUserMessage message))
+            {
+                return;
+            }
+
+            var argPos = 0;
+            if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos) &&
+                !message.HasCharPrefix(_settings.Prefix, ref argPos))
+            {
+                return;
+            }
+
+            var context = new SocketCommandContext(_discord, message);
+
+            var result = await _commands.ExecuteAsync(context, argPos, _provider);
+
+            if (result.Error.HasValue)
+            {
+                var resultMessage = result.Error switch
+                {
+                    CommandError.UnknownCommand => null,
+                    CommandError.BadArgCount => "**Bad number of arguments**\nDouble check if your command is correct.",
+                    _ => "An unknown error occurred while trying to process the command."
+                };
+
+                if (string.IsNullOrWhiteSpace(resultMessage))
+                {
+                    return;
+                }
+
+                await botMessage.ModifyAsync(editMessage => editMessage.Content = resultMessage);
+            }
         }
 
         public async Task InitializeAsync(IServiceProvider provider)

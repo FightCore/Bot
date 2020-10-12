@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Sockets;
 using System.Threading.Tasks;
+using Discord;
 using Discord.Commands;
+using Discord.WebSocket;
 using FightCore.Api.Services;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators;
@@ -26,6 +29,7 @@ namespace FightCore.Bot.Modules
         private readonly bool _isEnabled;
         private readonly LoggingSettings _loggingSettings;
         private readonly LogService _logger;
+        private readonly FailedMessageService _failedMessageService;
 
         public CharacterModule(
             ICharacterService characterService,
@@ -34,7 +38,8 @@ namespace FightCore.Bot.Modules
             NotFoundEmbedCreator notFoundEmbedCreator,
             IOptions<LoggingSettings> loggingSettings,
             LogService logger,
-            IOptions<ModuleSettings> moduleSettings)
+            IOptions<ModuleSettings> moduleSettings,
+            FailedMessageService failedMessageService)
         {
             _characterService = characterService;
             _frameDataService = frameDataService;
@@ -43,6 +48,7 @@ namespace FightCore.Bot.Modules
             _isEnabled = moduleSettings.Value.Moves;
             _loggingSettings = loggingSettings.Value;
             _logger = logger;
+            _failedMessageService = failedMessageService;
         }
 
 
@@ -59,8 +65,10 @@ namespace FightCore.Bot.Modules
         }
 
         [Command]
-        public async Task FrameDataTest([Remainder] string query)
+        public async Task GetFrameData([Remainder] string query)
         {
+            var botMessage = _failedMessageService.GetMessageIdForEditMessage(Context.Message.Id);
+
             var sections = query.Split(' ');
             switch (sections[0])
             {
@@ -117,7 +125,8 @@ namespace FightCore.Bot.Modules
                 {
                     var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string>()
                         {{"Character", character}});
-                    await ReplyAsync("", embed: notFoundEmbed);
+                    var responseMessage = await ReplyAsync("", embed: notFoundEmbed);
+                    _failedMessageService.AddFailedMessaged(Context.Message.Id, responseMessage);
 
                     if (_loggingSettings.Moves)
                     {
@@ -142,7 +151,7 @@ namespace FightCore.Bot.Modules
                         return;
                 }
 
-                await GetMoveData(characterEntity, fightCoreCharacter, move);
+                await GetMoveData(characterEntity, fightCoreCharacter, move, botMessage);
             }
         }
 
@@ -172,7 +181,7 @@ namespace FightCore.Bot.Modules
             }
         }
 
-        private async Task GetMoveData(WrapperCharacter characterEntity, Character fightCoreCharacter, string move)
+        private async Task GetMoveData(WrapperCharacter characterEntity, Character fightCoreCharacter, string move, IUserMessage botMessage)
         {
             var result = _frameDataService.GetMove(characterEntity.NormalizedName, move, characterEntity);
             if (result == null)
@@ -184,7 +193,16 @@ namespace FightCore.Bot.Modules
 
                 var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string>()
                     {{"Character", characterEntity.NormalizedName}, {"Move", move}});
-                await ReplyAsync("", embed: notFoundEmbed);
+                if (botMessage == null)
+                {
+                    var responseMessage = await ReplyAsync(string.Empty, embed: notFoundEmbed);
+                    _failedMessageService.AddFailedMessaged(Context.Message.Id, responseMessage);
+                }
+                else
+                {
+                    await botMessage.ModifyAsync(updateMessage => updateMessage.Embed = notFoundEmbed);
+                }
+                
                 return;
             }
 
@@ -195,7 +213,14 @@ namespace FightCore.Bot.Modules
                 _logger.LogMessage(LogLevel.Information, "[Character]: {0}, [Move]: {1}", characterEntity.Name, move);
             }
 
-            await ReplyAsync(string.Empty, embed: embed);
+            if (botMessage == null)
+            {
+                await ReplyAsync(string.Empty, embed: embed);
+            }
+            else
+            {
+                await botMessage.ModifyAsync(updateMessage => updateMessage.Embed = embed);
+            }
         }
     }
 }

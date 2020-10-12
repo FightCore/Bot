@@ -51,6 +51,7 @@ namespace FightCore.Bot
             return new ServiceCollection()
                 // Base
                 .AddSingleton(_client)
+                .AddSingleton<FailedMessageService>()
                 .AddSingleton<CommandService>()
                 // Logging
                 .AddLogging()
@@ -76,6 +77,7 @@ namespace FightCore.Bot
         {
             return new ConfigurationBuilder()
                 .AddJsonFile("appsettings.json")
+                .AddJsonFile("appsettings.local.json", optional: true)
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .Build();
         }
