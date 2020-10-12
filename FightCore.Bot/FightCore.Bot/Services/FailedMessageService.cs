@@ -12,11 +12,9 @@ namespace FightCore.Bot.Services
         private readonly Dictionary<ulong, IUserMessage> _failedMessages;
 
         private const double TimerInterval = 1000 * 60 * 2;
-        private readonly LogService _logger;
 
-        public FailedMessageService(LogService logger)
+        public FailedMessageService()
         {
-            _logger = logger;
             _failedMessages = new Dictionary<ulong, IUserMessage>();
         }
 
