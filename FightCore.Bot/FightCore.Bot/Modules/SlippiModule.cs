@@ -18,49 +18,44 @@ namespace FightCore.Bot.Modules
         private readonly ISlippiPlayerService _slippiPlayerService;
         private readonly NotFoundEmbedCreator _notFoundEmbedCreator;
         private readonly PlayerEmbedCreator _playerEmbedCreator;
-        private readonly bool _enabled;
 
         public SlippiModule(ISlippiPlayerService slippiPlayerService,
             NotFoundEmbedCreator notFoundEmbedCreator,
-            PlayerEmbedCreator playerEmbedCreator,
-            IOptions<ModuleSettings> moduleSettings)
+            PlayerEmbedCreator playerEmbedCreator)
         {
             _slippiPlayerService = slippiPlayerService;
             _notFoundEmbedCreator = notFoundEmbedCreator;
             _playerEmbedCreator = playerEmbedCreator;
-            _enabled = moduleSettings.Value.SlippiStats;
         }
 
         [Command]
         public async Task GetPlayerInfo([Remainder] string tags)
         {
-            if (!_enabled)
+            using (Context.Channel.EnterTypingState())
             {
-                return;
+                var splitTags = tags.Split(" vs ");
+                string opponentCode = null;
+                if (splitTags.Length == 2)
+                {
+                    tags = splitTags[0];
+                    opponentCode = splitTags[1];
+                }
+
+                var playerData = await _slippiPlayerService.GetForUser(tags, opponentCode);
+
+                if (playerData == null)
+                {
+                    var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string> { { nameof(playerData), tags } });
+                    await ReplyAsync(string.Empty, embed: notFoundEmbed);
+                    return;
+                }
+
+                var embed = playerData.Opponent != null
+                    ? _playerEmbedCreator.CreateVsEmbed(playerData)
+                    : _playerEmbedCreator.CreatePlayerEmbed(playerData);
+
+                await ReplyAsync(string.Empty, embed: embed);
             }
-
-            var splitTags = tags.Split(" vs ");
-            string opponentCode = null;
-            if (splitTags.Length == 2)
-            {
-                tags = splitTags[0];
-                opponentCode = splitTags[1];
-            }
-
-            var playerData = await _slippiPlayerService.GetForUser(tags, opponentCode);
-
-            if (playerData == null)
-            {
-                var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string> {{nameof(playerData), tags } });
-                await ReplyAsync(string.Empty, embed: notFoundEmbed);
-                return;
-            }
-           
-            var embed = playerData.Opponent != null
-                ? _playerEmbedCreator.CreateVsEmbed(playerData)
-                : _playerEmbedCreator.CreatePlayerEmbed(playerData);
-
-            await ReplyAsync(string.Empty, embed: embed);
         }
     }
 }

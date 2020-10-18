@@ -32,34 +32,32 @@ namespace FightCore.Bot.EmbedCreators.Slippi
             return embedBuilder.Build();
         }
 
-        private EmbedBuilder CreatePlayerStats(EmbedBuilder embedBuilder, Player player, string playerName = null)
+        private EmbedBuilder CreatePlayerStats(EmbedBuilder embedBuilder, Player player)
         {
             if (string.IsNullOrWhiteSpace(player.PlayerData.Tag))
             {
                 player.PlayerData.Tag = "Opponent";
             }
 
-            embedBuilder.AddField("Player", $"**First known name**: {player.PlayerData.Tag}", true);
             var overallStatsBuilder = new StringBuilder();
+            AddField(overallStatsBuilder, "Name", player.PlayerData.Tag);
             AddField(overallStatsBuilder, "Wins", player.Overall.Wins.ToString());
             AddField(overallStatsBuilder, "LRA + Starts", player.Overall.LRAStarts.ToString());
             AddField(overallStatsBuilder, "Stocks taken", player.Overall.StocksTaken.ToString());
             AddField(overallStatsBuilder, "Four stocks", player.Overall.FourStocks.ToString());
-            embedBuilder.AddField($"Overall {playerName}", overallStatsBuilder.ToString(), true);
-
-            var averageStatsBuilder = new StringBuilder();
-            AddField(averageStatsBuilder, "Stocks taken", player.Average.StocksTaken);
-            AddField(averageStatsBuilder, "Stocks Differential", player.Average.StockDifferential);
-            AddField(averageStatsBuilder, "Inputs Per Minute", player.Average.APM);
-            AddField(averageStatsBuilder, "Kill percentage", player.Average.KillPercent);
-            AddField(averageStatsBuilder, "Neutral win ratio", player.Average.NeutralWinRatio);
-            AddField(averageStatsBuilder, "Beneficial counter hit ratio", player.Average.BeneficialCounterHitRatio);
-            AddField(averageStatsBuilder, "Beneficial trade ratio", player.Average.BeneficialTradeRatio);
-            AddField(averageStatsBuilder, "Conversion ratio", player.Average.ConversionRatio);
-            AddField(averageStatsBuilder, "Total Damage", player.Average.TotalDamage);
-            AddField(averageStatsBuilder, "Openings per kill", player.Average.OpeningsPerKill);
-            AddField(averageStatsBuilder, "Total Damage", player.Average.TotalDamage);
-            embedBuilder.AddField($"Average {playerName}", averageStatsBuilder.ToString(), true);
+            overallStatsBuilder.AppendLine("\n**Average**\n");
+            AddField(overallStatsBuilder, "Stocks taken", player.Average.StocksTaken);
+            AddField(overallStatsBuilder, "Stocks Differential", player.Average.StockDifferential);
+            AddField(overallStatsBuilder, "Inputs Per Minute", player.Average.APM);
+            AddField(overallStatsBuilder, "Kill percentage", player.Average.KillPercent);
+            AddField(overallStatsBuilder, "Neutral win ratio", player.Average.NeutralWinRatio);
+            AddField(overallStatsBuilder, "Beneficial counter hit ratio", player.Average.BeneficialCounterHitRatio);
+            AddField(overallStatsBuilder, "Beneficial trade ratio", player.Average.BeneficialTradeRatio);
+            AddField(overallStatsBuilder, "Conversion ratio", player.Average.ConversionRatio);
+            AddField(overallStatsBuilder, "Total Damage", player.Average.TotalDamage);
+            AddField(overallStatsBuilder, "Openings per kill", player.Average.OpeningsPerKill);
+            AddField(overallStatsBuilder, "Total Damage", player.Average.TotalDamage);
+            embedBuilder.AddField($"Overall", overallStatsBuilder.ToString(), true);
 
             return embedBuilder;
         }

@@ -59,6 +59,7 @@ namespace FightCore.Bot
                 .AddSingleton<FrameDataService>()
                 // Extra
                 .AddSingleton(_config)
+                .Configure<UsersConfiguration>(_config.GetSection("Users"))
                 .Configure<EmbedSettings>(_config.GetSection("EmbedSettings"))
                 .Configure<ModuleSettings>(_config.GetSection("Modules"))
                 .Configure<CommandSettings>(_config.GetSection("CommandSettings"))

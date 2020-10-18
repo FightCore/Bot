@@ -16,15 +16,19 @@ namespace FightCore.Bot.Services
     public class FrameDataService
     {
         private readonly List<WrapperCharacter> _characters;
-        private readonly List<Misc> _miscs;
+        private List<Misc> _miscs;
         private readonly List<MoveAlias> _moveAliases;
-        private readonly List<Character> _frameDataCharacters;
+        private List<Character> _frameDataCharacters;
 
         public FrameDataService()
         {
             _characters = JsonConvert.DeserializeObject<List<WrapperCharacter>>(File.ReadAllText("Data/Names.json"));
             _moveAliases = JsonConvert.DeserializeObject<List<MoveAlias>>(File.ReadAllText("Data/MoveAlias.json"));
+            ReloadData();
+        }
 
+        public void ReloadData()
+        {
             var moveService = new MoveService();
             _frameDataCharacters = moveService.GetCharacters().GetAwaiter().GetResult();
 
