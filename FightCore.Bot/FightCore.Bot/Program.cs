@@ -13,6 +13,7 @@ using FightCore.Bot.Services;
 using FightCore.SlippiStatsOnline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using ConfigurationBuilder = Microsoft.Extensions.Configuration.ConfigurationBuilder;
 
 namespace FightCore.Bot
@@ -22,6 +23,7 @@ namespace FightCore.Bot
         static void Main(string[] args)
             => new Program().MainAsync().GetAwaiter().GetResult();
 
+        private ulong _ownerId = 0;
         private DiscordSocketClient _client;
         private IConfiguration _config;
 
@@ -31,6 +33,12 @@ namespace FightCore.Bot
             _config = BuildConfig();
 
             var services = ConfigureServices();
+            var admins = services.GetService<IOptions<UsersConfiguration>>().Value.Admins;
+            if (admins.Count > 0)
+            {
+                _ownerId = admins[0];
+            }
+
             services.GetRequiredService<LogService>();
             await services.GetRequiredService<CommandHandlingService>().InitializeAsync(services);
 
@@ -40,10 +48,23 @@ namespace FightCore.Bot
             //    return Task.CompletedTask;
             //};
 
+            _client.JoinedGuild += ClientOnJoinedGuild;
+
             await _client.LoginAsync(TokenType.Bot, _config["token"]);
             await _client.StartAsync();
 
             await Task.Delay(-1);
+        }
+
+        private async Task ClientOnJoinedGuild(SocketGuild arg)
+        {
+            if (_ownerId <= 0)
+            {
+                return;
+            }
+
+            var dmChannel = await _client.GetDMChannelAsync(_ownerId);
+            await dmChannel.SendMessageAsync($"Joined {arg.Name}, Members: {arg.MemberCount}");
         }
 
         private IServiceProvider ConfigureServices()
