@@ -50,11 +50,11 @@ namespace FightCore.Bot.EmbedCreators.Characters
 
             var movementStringBuilder = new StringBuilder();
             AddIfPossible("Walk speed", statistics.WalkSpeed, movementStringBuilder);
-            AddIfPossible("Initial Dash", statistics.InitialDash, movementStringBuilder);
-            AddIfPossible("Dash frames", statistics.DashFrames, movementStringBuilder);
+            AddIfPossible("Initial Dash speed", statistics.InitialDash, movementStringBuilder);
+            AddIfPossible("Initial dash frames", statistics.DashFrames, movementStringBuilder);
             AddIfPossible("Run speed", statistics.RunSpeed, movementStringBuilder);
             AddIfPossible("Wave dash length (rank)", statistics.WaveDashLengthRank, movementStringBuilder);
-            AddIfPossible("Wave dash length", statistics.WaveDashLength, movementStringBuilder);
+            AddIfPossible("Perfect wave dash length", statistics.WaveDashLength, movementStringBuilder);
             AddIfPossible("PLA Intangibility Frames", statistics.PLAIntangibilityFrames, movementStringBuilder);
             AddString("Source", "https://smashboards.com/threads/ultimate-ground-movement-analysis-turbo-edition.392367/", movementStringBuilder);
             embedBuilder.AddField("Ground movement", movementStringBuilder.ToString());
