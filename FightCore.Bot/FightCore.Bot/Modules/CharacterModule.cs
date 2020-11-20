@@ -170,8 +170,9 @@ namespace FightCore.Bot.Modules
 
         private async Task Info(WrapperCharacter characterEntity, Character fightCoreCharacter)
         {
-            var misc = _frameDataService.GetMiscForCharacter(characterEntity.NormalizedName);
-            var embed = _characterInfoEmbedCreator.CreateInfoEmbed(characterEntity, fightCoreCharacter, misc);
+            var statistics = _frameDataService.GetStatsForCharacter(characterEntity.NormalizedName);
+            var info = _frameDataService.GetInfoForCharacter(characterEntity.Name);
+            var embed = _characterInfoEmbedCreator.CreateInfoEmbed(characterEntity, fightCoreCharacter, statistics, info);
 
             await ReplyAsync(string.Empty, embed: embed);
 

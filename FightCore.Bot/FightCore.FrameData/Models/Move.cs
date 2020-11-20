@@ -44,5 +44,7 @@ namespace FightCore.FrameData.Models
         public int? Percent { get; set; }
 
         public long CharacterId { get; set; }
+
+        public string Source { get; set; }
     }
 }

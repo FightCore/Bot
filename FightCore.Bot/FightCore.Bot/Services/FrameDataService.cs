@@ -69,9 +69,16 @@ namespace FightCore.Bot.Services
                 || wrapperCharacter.NormalizedName.Contains(normalizedName));
         }
 
-        public Misc GetMiscForCharacter(string name)
+        public CharacterStatistics GetStatsForCharacter(string normalizedName)
         {
-            return _miscs.FirstOrDefault(misc => misc.NormalizedCharacter == SearchHelper.Normalize(name));
+            var character = _frameDataCharacters.FirstOrDefault(character => character.NormalizedName == normalizedName);
+            return character?.CharacterStatistics;
+        }
+
+        public CharacterInfo GetInfoForCharacter(string normalizedName)
+        {
+            var character = _frameDataCharacters.FirstOrDefault(character => character.NormalizedName == normalizedName);
+            return character?.CharacterInfo;
         }
 
         public List<Move> GetMoves(string characterName)

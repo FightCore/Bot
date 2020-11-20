@@ -19,5 +19,7 @@ namespace FightCore.FrameData.Models
         public List<Move> Moves { get; set; }
 
         public CharacterStatistics CharacterStatistics { get; set; }
+
+        public CharacterInfo CharacterInfo { get; set; }
     }
 }

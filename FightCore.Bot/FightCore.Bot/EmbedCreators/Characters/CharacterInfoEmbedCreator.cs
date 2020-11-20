@@ -26,7 +26,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             _prefix = commandSetting.Value.Prefix;
         }
 
-        public Embed CreateInfoEmbed(WrapperCharacter wrapperCharacter, Character character, Misc misc)
+        public Embed CreateInfoEmbed(WrapperCharacter wrapperCharacter, Character character, CharacterStatistics statistics, CharacterInfo info)
         {
             var embedBuilder = new EmbedBuilder {Title = wrapperCharacter.Name};
 
@@ -48,16 +48,31 @@ namespace FightCore.Bot.EmbedCreators.Characters
             if (character?.CharacterImage != null)
                 embedBuilder.WithImageUrl(character.CharacterImage.Url);
 
-            var stringBuilder = new StringBuilder();
-            stringBuilder.AppendLine($"**Weight:** {misc.Weight}");
-            stringBuilder.AppendLine($"**Gravity:** {misc.Gravity}");
-            stringBuilder.AppendLine($"**Walk speed:** {misc.WalkSpeed}");
-            stringBuilder.AppendLine($"**Run speed:** {misc.RunSpeed}");
-            stringBuilder.AppendLine($"**Wave dash length (rank):** {misc.WaveDashLengthRank}");
-            stringBuilder.AppendLine($"**PLA Intangibility Frames:** {misc.PLAIntangibilityFrames}");
-            stringBuilder.AppendLine($"**Can wall jump:** {misc.CanWallJump}");
-            stringBuilder.AppendLine($"**Jump squat:** {misc.JumpSquat}");
-            embedBuilder.AddField("Frame data", stringBuilder.ToString());
+            var movementStringBuilder = new StringBuilder();
+            AddIfPossible("Walk speed", statistics.WalkSpeed, movementStringBuilder);
+            AddIfPossible("Initial Dash", statistics.InitialDash, movementStringBuilder);
+            AddIfPossible("Dash frames", statistics.DashFrames, movementStringBuilder);
+            AddIfPossible("Run speed", statistics.RunSpeed, movementStringBuilder);
+            AddIfPossible("Wave dash length (rank)", statistics.WaveDashLengthRank, movementStringBuilder);
+            AddIfPossible("Wave dash length", statistics.WaveDashLength, movementStringBuilder);
+            AddIfPossible("PLA Intangibility Frames", statistics.PLAIntangibilityFrames, movementStringBuilder);
+            AddString("Source", "https://smashboards.com/threads/ultimate-ground-movement-analysis-turbo-edition.392367/", movementStringBuilder);
+            embedBuilder.AddField("Ground movement", movementStringBuilder.ToString());
+
+
+            var frameDataStringBuilder = new StringBuilder();
+            frameDataStringBuilder.AppendLine($"**Weight:** {statistics.Weight}");
+            frameDataStringBuilder.AppendLine($"**Gravity:** {statistics.Gravity}");
+            frameDataStringBuilder.AppendLine($"**Can wall jump:** {statistics.CanWallJump}");
+            frameDataStringBuilder.AppendLine($"**Jump squat:** {statistics.JumpSquat}");
+            embedBuilder.AddField("Frame data", frameDataStringBuilder.ToString());
+
+            var miscStringBuilder = new StringBuilder();
+            AddString("Discord", info?.Discord, miscStringBuilder);
+            AddString("MeleeFrameData", info?.MeleeFrameData, miscStringBuilder);
+            AddString("SSB Wiki", info?.SsbWiki, miscStringBuilder);
+            AddString("FightCore", $"https://www.fightcore.gg/character/{wrapperCharacter.FightCoreId}", miscStringBuilder);
+            embedBuilder.AddField("Misc data", miscStringBuilder.ToString());
 
             embedBuilder.WithUrl($"https://www.fightcore.gg/character/{wrapperCharacter.FightCoreId}");
             embedBuilder = AddFooter(embedBuilder);
@@ -93,7 +108,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             }
 
             AddString("Notes", move.Notes, frameDataBuilder);
-            AddString("Source", "http://www.meleeframedata.com", frameDataBuilder);
+            AddString("Source", move.Source, frameDataBuilder);
 
             if (!string.IsNullOrWhiteSpace(frameDataBuilder.ToString()))
             {
@@ -194,6 +209,16 @@ namespace FightCore.Bot.EmbedCreators.Characters
         }
         
         private static void AddIfPossible(string key, int? value, StringBuilder stringBuilder)
+        {
+            if (!value.HasValue || value <= 0)
+            {
+                return;
+            }
+
+            stringBuilder.Append($"**{key}:** {value}\n");
+        }
+
+        private static void AddIfPossible(string key, double? value, StringBuilder stringBuilder)
         {
             if (!value.HasValue || value <= 0)
             {
