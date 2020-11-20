@@ -50,7 +50,7 @@ namespace FightCore.Bot.EmbedCreators.Base
 
         protected EmbedBuilder AddFooter(EmbedBuilder builder)
         {
-            const string version = "v1.3.0";
+            const string version = "v1.3.1";
             switch (EmbedSettings.FooterType)
             {
                 case FooterType.FightCore:
