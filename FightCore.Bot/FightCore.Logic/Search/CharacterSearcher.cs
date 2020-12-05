@@ -56,6 +56,47 @@ namespace FightCore.Logic.Search
                 characterEntity = _frameDataService.GetCharacter(character);
             }
 
+            if (characterEntity != null)
+            {
+                return (characterEntity, remainder);
+            }
+
+            // Reset all the temp variables.
+            tempCharacter = null;
+            character = null;
+            remainder = null;
+            iterator = 1;
+
+            Array.Reverse(query);
+            foreach (var section in query)
+            {
+                if (tempCharacter == null)
+                {
+                    character = string.Join(' ', query);
+                    tempCharacter = section;
+                }
+                else
+                {
+                    tempCharacter = section + " " + tempCharacter;
+                }
+
+                characterEntity = _frameDataService.GetCharacter(tempCharacter);
+                if (characterEntity == null)
+                {
+                    iterator++;
+                    continue;
+                }
+
+                var split = iterator++;
+                character = tempCharacter;
+                remainder = string.Join(' ', query[split..]);
+            }
+
+            if (characterEntity == null && !string.IsNullOrWhiteSpace(character))
+            {
+                characterEntity = _frameDataService.GetCharacter(character);
+            }
+
             return (characterEntity, remainder);
         }
     }
