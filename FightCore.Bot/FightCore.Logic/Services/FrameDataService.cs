@@ -2,16 +2,16 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FightCore.Bot.Helpers;
-using FightCore.Bot.Models.FrameData;
-using FightCore.Bot.Models.Helpers;
 using FightCore.FrameData;
 using FightCore.FrameData.Models;
+using FightCore.Logic.Aliasses.FrameData;
+using FightCore.Logic.Aliasses.Helpers;
+using FightCore.Logic.Search;
 using FightCore.MeleeFrameData;
 using Newtonsoft.Json;
 using Move = FightCore.FrameData.Models.Move;
 
-namespace FightCore.Bot.Services
+namespace FightCore.Logic.Services
 {
     public class FrameDataService
     {

@@ -1,9 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Net.NetworkInformation;
 using System.Timers;
 using Discord;
-using Discord.WebSocket;
-using Microsoft.Extensions.Logging;
 
 namespace FightCore.Bot.Services
 {

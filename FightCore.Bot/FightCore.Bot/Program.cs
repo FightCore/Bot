@@ -10,6 +10,8 @@ using FightCore.Bot.EmbedCreators;
 using FightCore.Bot.EmbedCreators.Characters;
 using FightCore.Bot.EmbedCreators.Slippi;
 using FightCore.Bot.Services;
+using FightCore.Logic.Search;
+using FightCore.Logic.Services;
 using FightCore.SlippiStatsOnline;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -87,6 +89,7 @@ namespace FightCore.Bot
                 .Configure<LoggingSettings>(_config.GetSection("Logging"))
                 .AddScoped<ICharacterService, CharacterService>()
                 .AddScoped<ISlippiPlayerService, SlippiPlayerService>()
+                .AddScoped<ICharacterSearcher, CharacterSearcher>()
                 .AddScoped<CharacterInfoEmbedCreator>()
                 .AddScoped<NotFoundEmbedCreator>()
                 .AddScoped<PlayerEmbedCreator>()

@@ -1,14 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Discord;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators.Base;
-using FightCore.Bot.Helpers;
-using FightCore.Bot.Models.FrameData;
 using FightCore.FrameData.Models;
-using FightCore.MeleeFrameData;
+using FightCore.Logic.Aliasses.FrameData;
+using FightCore.Logic.Search;
 using Microsoft.Extensions.Options;
 using Character = FightCore.Api.Models.Character;
 using Move = FightCore.FrameData.Models.Move;
@@ -207,7 +205,7 @@ namespace FightCore.Bot.EmbedCreators.Characters
             embedBuilder.Title = $"{character.Name} - {move.Name}";
             return AddFooter(embedBuilder);
         }
-        
+
         private static void AddIfPossible(string key, int? value, StringBuilder stringBuilder)
         {
             if (!value.HasValue || value <= 0)

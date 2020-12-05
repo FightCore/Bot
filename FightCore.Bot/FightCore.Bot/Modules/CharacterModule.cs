@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Net.Sockets;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
-using Discord.WebSocket;
 using FightCore.Api.Services;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators;
 using FightCore.Bot.EmbedCreators.Characters;
-using FightCore.Bot.Models.FrameData;
 using FightCore.Bot.Services;
+using FightCore.Logic.Aliasses.FrameData;
+using FightCore.Logic.Search;
+using FightCore.Logic.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Character = FightCore.Api.Models.Character;
@@ -24,6 +24,7 @@ namespace FightCore.Bot.Modules
     {
         private readonly ICharacterService _characterService;
         private readonly FrameDataService _frameDataService;
+        private readonly ICharacterSearcher _characterSearcher;
         private readonly CharacterInfoEmbedCreator _characterInfoEmbedCreator;
         private readonly NotFoundEmbedCreator _notFoundEmbedCreator;
         private readonly bool _isEnabled;
@@ -39,6 +40,7 @@ namespace FightCore.Bot.Modules
             IOptions<LoggingSettings> loggingSettings,
             LogService logger,
             IOptions<ModuleSettings> moduleSettings,
+            ICharacterSearcher characterSearcher,
             FailedMessageService failedMessageService)
         {
             _characterService = characterService;
@@ -49,6 +51,7 @@ namespace FightCore.Bot.Modules
             _loggingSettings = loggingSettings.Value;
             _logger = logger;
             _failedMessageService = failedMessageService;
+            _characterSearcher = characterSearcher;
         }
 
 
@@ -87,71 +90,38 @@ namespace FightCore.Bot.Modules
 
             using (Context.Channel.EnterTypingState())
             {
-                WrapperCharacter characterEntity = null;
-                string character = null;
-                string move = null;
-                string tempCharacter = null;
-                var iterator = 1;
-                foreach (var section in sections)
-                {
-                    if (tempCharacter == null)
-                    {
-                        character = query;
-                        tempCharacter = section;
-                    }
-                    else
-                    {
-                        tempCharacter += " " + section;
-                    }
-
-                    characterEntity = _frameDataService.GetCharacter(tempCharacter);
-                    if (characterEntity == null)
-                    {
-                        iterator++;
-                        continue;
-                    }
-
-                    var split = iterator++;
-                    character = tempCharacter;
-                    move = string.Join(' ', sections[split..]);
-                }
-
-                if (characterEntity == null && !string.IsNullOrWhiteSpace(character))
-                {
-                    characterEntity = _frameDataService.GetCharacter(character);
-                }
-
+                var (character, remainder) = _characterSearcher.Get(sections);
+                var characterEntity = character;
                 if (characterEntity == null)
                 {
                     var notFoundEmbed = _notFoundEmbedCreator.Create(new Dictionary<string, string>()
-                        {{"Character", character}});
+                        {{"Character", query}});
                     var responseMessage = await ReplyAsync("", embed: notFoundEmbed);
                     _failedMessageService.AddFailedMessaged(Context.Message.Id, responseMessage);
 
                     if (_loggingSettings.Moves)
                     {
-                        _logger.LogMessage(LogLevel.Information, "NOT FOUND [Character]: {0}", character);
+                        _logger.LogMessage(LogLevel.Information, "NOT FOUND [Character]: {0}", query);
                     }
                     return;
                 }
 
                 var fightCoreCharacter = await _characterService.GetByIdAsync(characterEntity.FightCoreId);
 
-                if (string.IsNullOrWhiteSpace(move))
+                if (string.IsNullOrWhiteSpace(remainder))
                 {
                     await Info(characterEntity, fightCoreCharacter);
                     return;
                 }
 
-                // ReSharper disable once PossibleNullReferenceException
-                switch (move.Split(' ')[0])
+                switch (remainder.Split(' ')[0])
                 {
                     case "moves":
                         await ListMoves(characterEntity, fightCoreCharacter);
                         return;
                 }
 
-                await GetMoveData(characterEntity, fightCoreCharacter, move, botMessage);
+                await GetMoveData(characterEntity, fightCoreCharacter, remainder, botMessage);
             }
         }
 
@@ -203,7 +173,7 @@ namespace FightCore.Bot.Modules
                 {
                     await botMessage.ModifyAsync(updateMessage => updateMessage.Embed = notFoundEmbed);
                 }
-                
+
                 return;
             }
 

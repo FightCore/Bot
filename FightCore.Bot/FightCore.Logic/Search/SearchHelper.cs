@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace FightCore.Bot.Helpers
+namespace FightCore.Logic.Search
 {
     public static class SearchHelper
     {

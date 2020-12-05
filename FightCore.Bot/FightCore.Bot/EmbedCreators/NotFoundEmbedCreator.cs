@@ -3,7 +3,7 @@ using System.Text;
 using Discord;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators.Base;
-using FightCore.Bot.Helpers;
+using FightCore.Logic.Search;
 using Microsoft.Extensions.Options;
 
 namespace FightCore.Bot.EmbedCreators

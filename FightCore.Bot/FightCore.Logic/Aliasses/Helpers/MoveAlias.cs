@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FightCore.Bot.Models.Helpers
+namespace FightCore.Logic.Aliasses.Helpers
 {
     public class MoveAlias
     {

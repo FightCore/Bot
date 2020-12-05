@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace FightCore.Bot.Models.FrameData
+namespace FightCore.Logic.Aliasses.FrameData
 {
     public class WrapperCharacter
     {

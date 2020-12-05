@@ -1,10 +1,9 @@
-﻿using System.Linq;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
 using Discord.WebSocket;
 using FightCore.Bot.Configuration;
-using FightCore.Bot.Services;
+using FightCore.Logic.Services;
 using Microsoft.Extensions.Options;
 
 namespace FightCore.Bot.Modules

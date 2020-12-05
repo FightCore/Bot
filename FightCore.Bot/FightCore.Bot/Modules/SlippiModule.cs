@@ -1,14 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
+﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using Discord;
 using Discord.Commands;
-using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators;
 using FightCore.Bot.EmbedCreators.Slippi;
 using FightCore.SlippiStatsOnline;
-using Microsoft.Extensions.Options;
 
 namespace FightCore.Bot.Modules
 {

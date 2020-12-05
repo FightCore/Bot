@@ -24,6 +24,7 @@
   <ItemGroup>
     <ProjectReference Include="..\FightCore.Api\FightCore.Api.csproj" />
     <ProjectReference Include="..\FightCore.FrameData\FightCore.FrameData.csproj" />
+    <ProjectReference Include="..\FightCore.Logic\FightCore.Logic.csproj" />
     <ProjectReference Include="..\FightCore.MeleeFrameData\FightCore.MeleeFrameData.csproj" />
     <ProjectReference Include="..\FightCore.SlippiStatsOnline\FightCore.SlippiStatsOnline.csproj" />
   </ItemGroup>
@@ -41,6 +42,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="appsettings.local.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
     <None Update="appsettings.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
@@ -56,6 +60,11 @@
     <None Update="Data\Names.json">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Helpers\" />
+    <Folder Include="Models\" />
   </ItemGroup>
 
   <ProjectExtensions><VisualStudio><UserProperties /></VisualStudio></ProjectExtensions>
