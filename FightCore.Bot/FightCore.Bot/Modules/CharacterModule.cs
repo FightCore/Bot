@@ -83,6 +83,9 @@ namespace FightCore.Bot.Modules
                     sections = list.ToArray();
                     break;
                 }
+                case "help":
+                    await Help();
+                    return;
             }
 
             using (Context.Channel.EnterTypingState())

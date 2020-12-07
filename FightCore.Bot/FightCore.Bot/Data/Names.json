@@ -51,7 +51,8 @@
       "laser": "neutralb",
       "shine": "downb",
       "aerialblaster": "aneutralb",
-      "aeriallaser": "aneutralb"
+      "aeriallaser": "aneutralb",
+      "drill":  "dair" 
     },
     "FightCoreId": 218
   },
@@ -65,7 +66,8 @@
       "shine": "downb",
       "laser": "neutralb",
       "aerialblaster": "aneutralb",
-      "aeriallaser": "aneutralb"
+      "aeriallaser": "aneutralb",
+      "drill":  "dair" 
     }
   },
   {

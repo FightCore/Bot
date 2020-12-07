@@ -7,6 +7,8 @@ using Discord.Commands;
 using Discord.WebSocket;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.Modules;
+using FightCore.Models;
+using FightCore.Services;
 using Microsoft.Extensions.Options;
 
 namespace FightCore.Bot.Services
@@ -19,6 +21,7 @@ namespace FightCore.Bot.Services
         private readonly CommandSettings _settings;
         private readonly ModuleSettings _moduleSettings;
         private readonly FailedMessageService _failedMessageService;
+        private readonly IServerSettingsService _serverSettingsService;
 
         private readonly Dictionary<string, Type> _moduleDictionary = new Dictionary<string, Type>()
         {
@@ -33,6 +36,7 @@ namespace FightCore.Bot.Services
             CommandService commands,
             IOptions<ModuleSettings> moduleOptions,
             IOptions<CommandSettings> commandSettings,
+            IServerSettingsService serverSettingsService,
             FailedMessageService failedMessageService)
         {
             _discord = discord;
@@ -43,6 +47,7 @@ namespace FightCore.Bot.Services
             _discord.MessageReceived += MessageReceived;
             _discord.MessageUpdated += DiscordOnMessageUpdated;
             _failedMessageService = failedMessageService;
+            _serverSettingsService = serverSettingsService;
         }
 
         private async Task DiscordOnMessageUpdated(Cacheable<IMessage, ulong> originalMessage, SocketMessage socketMessage, ISocketMessageChannel channel)
@@ -92,6 +97,7 @@ namespace FightCore.Bot.Services
             _provider = provider;
             await _commands.AddModuleAsync(typeof(HelpModule), _provider);
             await _commands.AddModuleAsync(typeof(AdminModule), _provider);
+            await _commands.AddModuleAsync(typeof(ServerModule), _provider);
             if (_moduleSettings.SlippiStats) await AddModule(nameof(_moduleSettings.SlippiStats));
             if (_moduleSettings.Moves) await AddModule(nameof(_moduleSettings.Moves));
             if (_moduleSettings.Tournaments) await AddModule(nameof(_moduleSettings.Tournaments));
@@ -108,6 +114,17 @@ namespace FightCore.Bot.Services
             if (!(rawMessage is SocketUserMessage message)) return;
             if (message.Source != MessageSource.User) return;
 
+            var context = new SocketCommandContext(_discord, message);
+            ServerSettings settings = null;
+            if (context.Guild == null)
+            {
+                settings = _serverSettingsService.CreateDefaultSettings();
+            }
+            else
+            {
+                settings = await _serverSettingsService.GetForServerId(context.Guild.Id);
+            }
+
             // Check if there is a channel id specified.
             // If there is, check if its the correct channel, else just return and ignore.
             if (_settings.ChannelId.HasValue && message.Channel.Id != _settings.ChannelId.Value)
@@ -117,12 +134,10 @@ namespace FightCore.Bot.Services
 
             var argPos = 0;
             if (!message.HasMentionPrefix(_discord.CurrentUser, ref argPos) &&
-                !message.HasCharPrefix(_settings.Prefix, ref argPos))
+                !message.HasCharPrefix(settings.Prefix[0], ref argPos))
             {
                 return;
             }
-
-            var context = new SocketCommandContext(_discord, message);
 
             var result = await _commands.ExecuteAsync(context, argPos, _provider);
 

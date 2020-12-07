@@ -10,7 +10,10 @@ using FightCore.Bot.EmbedCreators;
 using FightCore.Bot.EmbedCreators.Characters;
 using FightCore.Bot.EmbedCreators.Slippi;
 using FightCore.Bot.Services;
+using FightCore.Data;
+using FightCore.Services;
 using FightCore.SlippiStatsOnline;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -78,6 +81,9 @@ namespace FightCore.Bot
                 .AddLogging()
                 .AddSingleton<LogService>()
                 .AddSingleton<FrameDataService>()
+                // Storage
+                .AddDbContext<ServerContext>(options =>
+                    options.UseSqlServer(_config.GetConnectionString("DefaultConnection")))
                 // Extra
                 .AddSingleton(_config)
                 .Configure<UsersConfiguration>(_config.GetSection("Users"))
@@ -90,6 +96,7 @@ namespace FightCore.Bot
                 .AddScoped<CharacterInfoEmbedCreator>()
                 .AddScoped<NotFoundEmbedCreator>()
                 .AddScoped<PlayerEmbedCreator>()
+                .AddScoped<IServerSettingsService, ServerSettingsService>()
                 // Add additional services here...
                 .AddSingleton<CommandHandlingService>()
                 .BuildServiceProvider();
