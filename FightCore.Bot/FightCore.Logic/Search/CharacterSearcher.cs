@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using FightCore.Logic.Aliasses.FrameData;
 using FightCore.Logic.Services;
 
@@ -89,7 +87,9 @@ namespace FightCore.Logic.Search
 
                 var split = iterator++;
                 character = tempCharacter;
-                remainder = string.Join(' ', query[split..]);
+                var remainderArray = query[split..];
+                Array.Reverse(remainderArray);
+                remainder = string.Join(' ', remainderArray);
             }
 
             if (characterEntity == null && !string.IsNullOrWhiteSpace(character))

@@ -16,7 +16,6 @@ namespace FightCore.Logic.Services
     public class FrameDataService
     {
         private readonly List<WrapperCharacter> _characters;
-        private List<Misc> _miscs;
         private readonly List<MoveAlias> _moveAliases;
         private List<Character> _frameDataCharacters;
 
@@ -43,18 +42,6 @@ namespace FightCore.Logic.Services
             foreach (var wrapperCharacter in _characters)
             {
                 wrapperCharacter.NormalizedName = SearchHelper.Normalize(wrapperCharacter.Name);
-            }
-
-            using (var frameDataContext = new MeleeFrameDataContext())
-            {
-                _miscs = frameDataContext.Misc.ToList();
-            }
-
-            foreach (var misc in _miscs)
-            {
-                misc.NormalizedCharacter = SearchHelper.Normalize(misc.Character);
-                misc.NormalizedType = SearchHelper.Normalize(misc.Character);
-                misc.NormalizedName = SearchHelper.Normalize(misc.Character);
             }
         }
 

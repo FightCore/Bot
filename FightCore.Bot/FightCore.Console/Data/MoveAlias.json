@@ -1,0 +1,65 @@
+﻿[
+  {
+    "move": "neutralb",
+    "alias": [
+      "b",
+      "neutralspecial"
+    ]
+  },
+  {
+    "move": "neutraltech",
+    "alias": [
+      "tech"
+    ]
+  },
+  {
+    "move": "fsmash",
+    "alias": [
+      "sidesmash"
+    ]
+  },
+  {
+    "move": "sideb",
+    "alias": [
+      "sidespecial"
+    ]
+  },
+  {
+    "move": "dowmb",
+    "alias": [
+      "downspecial"
+    ]
+  },
+  {
+    "move": "upb",
+    "alias": [
+      "upspecial"
+    ]
+  },
+  {
+    "move": "grab",
+    "alias": [
+      "shieldgrab"
+    ]
+  },
+  {
+    "move": "forwardroll",
+    "alias": [
+      "froll",
+      "forwardsroll"
+    ]
+  },
+  {
+    "move": "backroll",
+    "alias": [
+      "broll",
+      "backwardroll"
+    ]
+  },
+  {
+    "move": "dair",
+    "alias": [
+      "stomp"
+    ] 
+  }
+]
