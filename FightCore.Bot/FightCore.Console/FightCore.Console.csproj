@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net5.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\FightCore.Api\FightCore.Api.csproj" />
+    <ProjectReference Include="..\FightCore.FrameData\FightCore.FrameData.csproj" />
+    <ProjectReference Include="..\FightCore.Logic\FightCore.Logic.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\MoveAlias.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="Data\Names.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

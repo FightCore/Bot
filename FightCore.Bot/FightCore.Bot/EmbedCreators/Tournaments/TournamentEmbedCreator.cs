@@ -1,7 +1,4 @@
-﻿using System;
-using System.Linq;
-using System.Text;
-using Discord;
+﻿using System.Text;
 using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators.Base;
 using Microsoft.Extensions.Options;
@@ -27,7 +24,7 @@ namespace FightCore.Bot.EmbedCreators.Tournaments
         //    var generalInformationBuilder = new StringBuilder();
         //    AddIfNotNull(tournament.StartAtDateTime?.ToLongDateString(), "Starts", generalInformationBuilder);
         //    AddIfNotNull(tournament.VenueName, "Venue", generalInformationBuilder);
-            
+
 
         //    foreach (var grouping in tournament.Events.GroupBy(@event => @event.Videogame.Name))
         //    {

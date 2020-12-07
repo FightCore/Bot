@@ -1,8 +1,6 @@
-﻿using System;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Discord.Commands;
 using FightCore.Bot.Configuration;
-using FightCore.Bot.EmbedCreators.Tournaments;
 using Microsoft.Extensions.Options;
 
 namespace FightCore.Bot.Modules

@@ -2,21 +2,20 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using FightCore.Bot.Helpers;
-using FightCore.Bot.Models.FrameData;
-using FightCore.Bot.Models.Helpers;
 using FightCore.FrameData;
 using FightCore.FrameData.Models;
+using FightCore.Logic.Aliasses.FrameData;
+using FightCore.Logic.Aliasses.Helpers;
+using FightCore.Logic.Search;
 using FightCore.MeleeFrameData;
 using Newtonsoft.Json;
 using Move = FightCore.FrameData.Models.Move;
 
-namespace FightCore.Bot.Services
+namespace FightCore.Logic.Services
 {
     public class FrameDataService
     {
         private readonly List<WrapperCharacter> _characters;
-        private List<Misc> _miscs;
         private readonly List<MoveAlias> _moveAliases;
         private List<Character> _frameDataCharacters;
 
@@ -43,18 +42,6 @@ namespace FightCore.Bot.Services
             foreach (var wrapperCharacter in _characters)
             {
                 wrapperCharacter.NormalizedName = SearchHelper.Normalize(wrapperCharacter.Name);
-            }
-
-            using (var frameDataContext = new MeleeFrameDataContext())
-            {
-                _miscs = frameDataContext.Misc.ToList();
-            }
-
-            foreach (var misc in _miscs)
-            {
-                misc.NormalizedCharacter = SearchHelper.Normalize(misc.Character);
-                misc.NormalizedType = SearchHelper.Normalize(misc.Character);
-                misc.NormalizedName = SearchHelper.Normalize(misc.Character);
             }
         }
 
