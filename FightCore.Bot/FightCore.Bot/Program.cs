@@ -1,5 +1,7 @@
 ﻿using System;
 using System.IO;
+using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Discord;
 using Discord.Commands;
@@ -79,13 +81,14 @@ namespace FightCore.Bot
                 .AddSingleton(_client)
                 .AddSingleton<FailedMessageService>()
                 .AddSingleton<CommandService>()
+                .AddSingleton<AerialReactionService>()
                 // Logging
                 .AddLogging()
                 .AddSingleton<LogService>()
                 .AddSingleton<FrameDataService>()
                 // Storage
                 .AddDbContext<ServerContext>(options =>
-                    options.UseSqlServer(_config.GetConnectionString("DefaultConnection")))
+                    options.UseInMemoryDatabase("FightCore"))
                 // Extra
                 .AddSingleton(_config)
                 .Configure<UsersConfiguration>(_config.GetSection("Users"))

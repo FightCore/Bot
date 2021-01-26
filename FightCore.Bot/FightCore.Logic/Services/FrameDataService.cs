@@ -15,28 +15,25 @@ namespace FightCore.Logic.Services
 {
     public class FrameDataService
     {
-        private readonly List<WrapperCharacter> _characters;
-        private readonly List<MoveAlias> _moveAliases;
+        private List<WrapperCharacter> _characters;
+        private List<MoveAlias> _moveAliases;
         private List<Character> _frameDataCharacters;
 
         public FrameDataService()
         {
-            _characters = JsonConvert.DeserializeObject<List<WrapperCharacter>>(File.ReadAllText("Data/Names.json"));
-            _moveAliases = JsonConvert.DeserializeObject<List<MoveAlias>>(File.ReadAllText("Data/MoveAlias.json"));
             ReloadData();
         }
 
         public void ReloadData()
         {
+            _characters = JsonConvert.DeserializeObject<List<WrapperCharacter>>(File.ReadAllText("Data/Names.json"));
+            _moveAliases = JsonConvert.DeserializeObject<List<MoveAlias>>(File.ReadAllText("Data/MoveAlias.json"));
             var moveService = new MoveService();
             _frameDataCharacters = moveService.GetCharacters().GetAwaiter().GetResult();
 
-            foreach (var frameDataCharacter in _frameDataCharacters)
+            foreach (var move in _frameDataCharacters.SelectMany(frameDataCharacter => frameDataCharacter.Moves))
             {
-                foreach (var move in frameDataCharacter.Moves)
-                {
-                    move.NormalizedMoveName = SearchHelper.Normalize(move.Name);
-                }
+                move.NormalizedMoveName = SearchHelper.Normalize(move.Name);
             }
 
             foreach (var wrapperCharacter in _characters)
@@ -190,6 +187,16 @@ namespace FightCore.Logic.Services
             var moveName = SearchHelper.FindMatch(
                 characterEntity.Moves.Select(storedMove => storedMove.NormalizedName).ToList(),
                 normalizedMove);
+            if (!string.IsNullOrWhiteSpace(moveName))
+            {
+                // If it is found, return the move and mention that its found indirectly.
+                return characterEntity.Moves.FirstOrDefault(storedMove =>
+                    storedMove.NormalizedName.Equals(moveName, StringComparison.InvariantCultureIgnoreCase));
+            }
+
+            moveName = SearchHelper.FindMatch(
+                characterEntity.Moves.Select(storedMove => storedMove.Name).ToList(),
+                normalizedMove);
 
             // If this is still not found, just return null.
             if (string.IsNullOrWhiteSpace(moveName))
@@ -199,7 +206,7 @@ namespace FightCore.Logic.Services
 
             // If it is found, return the move and mention that its found indirectly.
             return characterEntity.Moves.FirstOrDefault(storedMove =>
-                storedMove.NormalizedName.Equals(moveName, StringComparison.InvariantCultureIgnoreCase));
+                storedMove.Name.Equals(moveName, StringComparison.InvariantCultureIgnoreCase));
         }
     }
 }

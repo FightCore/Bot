@@ -9,12 +9,14 @@ using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators;
 using FightCore.Bot.EmbedCreators.Characters;
 using FightCore.Bot.Services;
+using FightCore.FrameData.Models;
 using FightCore.Logic.Aliasses.FrameData;
 using FightCore.Logic.Search;
 using FightCore.Logic.Services;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Character = FightCore.Api.Models.Character;
+using Move = FightCore.FrameData.Models.Move;
 
 namespace FightCore.Bot.Modules
 {
@@ -181,6 +183,13 @@ namespace FightCore.Bot.Modules
             }
 
             result.Hitboxes.Sort((hitboxOne, hitboxTwo) => string.Compare(hitboxOne.Name, hitboxTwo.Name, StringComparison.Ordinal));
+
+            Move aerialVersion = null;
+            if (result.Type == MoveType.Special)
+            {
+                aerialVersion = GetAerialVersionOfMove(result, characterEntity);
+            }
+
             var embed = _characterInfoEmbedCreator.CreateMoveEmbed(characterEntity, result, fightCoreCharacter);
             if (_loggingSettings.Moves)
             {
@@ -189,12 +198,21 @@ namespace FightCore.Bot.Modules
 
             if (botMessage == null)
             {
-                await ReplyAsync(string.Empty, embed: embed);
+                var sentMessage = await ReplyAsync(string.Empty, embed: embed);
+                if (aerialVersion != null)
+                {
+                    //await sentMessage.AddReactionAsync(new Emoji("💨"));
+                }
             }
             else
             {
                 await botMessage.ModifyAsync(updateMessage => updateMessage.Embed = embed);
             }
+        }
+
+        private Move GetAerialVersionOfMove(Move move, WrapperCharacter character)
+        {
+            return _frameDataService.GetMove(character.NormalizedName,  "a" + move.NormalizedName, character);
         }
     }
 }

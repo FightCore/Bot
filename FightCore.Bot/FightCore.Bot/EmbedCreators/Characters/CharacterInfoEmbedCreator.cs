@@ -6,6 +6,7 @@ using FightCore.Bot.Configuration;
 using FightCore.Bot.EmbedCreators.Base;
 using FightCore.FrameData.Models;
 using FightCore.Logic.Aliasses.FrameData;
+using FightCore.Logic.Formatting;
 using FightCore.Logic.Search;
 using Microsoft.Extensions.Options;
 using Character = FightCore.Api.Models.Character;
@@ -17,11 +18,13 @@ namespace FightCore.Bot.EmbedCreators.Characters
     {
 
         private readonly char _prefix;
+        private readonly CharacterFormatting _formatter;
 
         public CharacterInfoEmbedCreator(IOptions<EmbedSettings> embedSettings,
             IOptions<CommandSettings> commandSetting) : base(embedSettings)
         {
             _prefix = commandSetting.Value.Prefix;
+            _formatter = new CharacterFormatting("**{0}:**");
         }
 
         public Embed CreateInfoEmbed(WrapperCharacter wrapperCharacter, Character character, CharacterStatistics statistics, CharacterInfo info)
@@ -46,30 +49,14 @@ namespace FightCore.Bot.EmbedCreators.Characters
             if (character?.CharacterImage != null)
                 embedBuilder.WithImageUrl(character.CharacterImage.Url);
 
-            var movementStringBuilder = new StringBuilder();
-            AddIfPossible("Walk speed", statistics.WalkSpeed, movementStringBuilder);
-            AddIfPossible("Initial Dash speed", statistics.InitialDash, movementStringBuilder);
-            AddIfPossible("Initial dash frames", statistics.DashFrames, movementStringBuilder);
-            AddIfPossible("Run speed", statistics.RunSpeed, movementStringBuilder);
-            AddIfPossible("Wave dash length (rank)", statistics.WaveDashLengthRank, movementStringBuilder);
-            AddIfPossible("Perfect wave dash length", statistics.WaveDashLength, movementStringBuilder);
-            AddIfPossible("PLA Intangibility Frames", statistics.PLAIntangibilityFrames, movementStringBuilder);
-            AddString("Source", "https://smashboards.com/threads/ultimate-ground-movement-analysis-turbo-edition.392367/", movementStringBuilder);
+            var movementStringBuilder = _formatter.CreateMovementData(statistics);
             embedBuilder.AddField("Ground movement", movementStringBuilder.ToString());
 
-
-            var frameDataStringBuilder = new StringBuilder();
-            frameDataStringBuilder.AppendLine($"**Weight:** {statistics.Weight}");
-            frameDataStringBuilder.AppendLine($"**Gravity:** {statistics.Gravity}");
-            frameDataStringBuilder.AppendLine($"**Can wall jump:** {statistics.CanWallJump}");
-            frameDataStringBuilder.AppendLine($"**Jump squat:** {statistics.JumpSquat}");
+            var frameDataStringBuilder = _formatter.CreateCharacterFrameData(statistics);
             embedBuilder.AddField("Frame data", frameDataStringBuilder.ToString());
 
-            var miscStringBuilder = new StringBuilder();
-            AddString("Discord", info?.Discord, miscStringBuilder);
-            AddString("MeleeFrameData", info?.MeleeFrameData, miscStringBuilder);
-            AddString("SSB Wiki", info?.SsbWiki, miscStringBuilder);
-            AddString("FightCore", $"https://www.fightcore.gg/character/{wrapperCharacter.FightCoreId}", miscStringBuilder);
+            var miscStringBuilder = _formatter.CreateCharacterMiscData(info, wrapperCharacter);
+
             embedBuilder.AddField("Misc data", miscStringBuilder.ToString());
 
             embedBuilder.WithUrl($"https://www.fightcore.gg/character/{wrapperCharacter.FightCoreId}");
@@ -80,65 +67,29 @@ namespace FightCore.Bot.EmbedCreators.Characters
         public Embed CreateMoveEmbed(WrapperCharacter character, Move move, Character fightCoreCharacter)
         {
             var embedBuilder = CreateDefaultFrameDataEmbed(character, move, fightCoreCharacter);
+            embedBuilder.Description = $"Technical name: **{move.NormalizedName}**";
 
-            var frameDataBuilder = new StringBuilder();
-            AddIfPossible("Total frames", move.TotalFrames, frameDataBuilder);
-            if (move.Start.HasValue && move.End.HasValue)
-            {
-                AddString("Hit", $"{move.Start} - {move.End}", frameDataBuilder);
-            }
-            else if (move.Start.HasValue)
-            {
-                AddIfPossible("Hit start", move.Start, frameDataBuilder);
-            }
-            else if (move.End.HasValue)
-            {
-                AddIfPossible("Hit end", move.End, frameDataBuilder);
-            }
-
-            AddIfPossible("IASA", move.IASA, frameDataBuilder);
-            AddIfPossible("Land lag", move.LandLag, frameDataBuilder);
-            AddIfPossible("L-Canceled", move.LCanceledLandLag, frameDataBuilder);
-
-            if (move.AutoCancelBefore.HasValue && move.AutoCancelAfter.HasValue && move.AutoCancelBefore > -1 && move.AutoCancelAfter > -1)
-            {
-                frameDataBuilder.AppendLine($"**Won't Auto Cancel:** {move.AutoCancelBefore}-{move.AutoCancelAfter}");
-            }
-
-            AddString("Notes", move.Notes, frameDataBuilder);
-            AddString("Source", move.Source, frameDataBuilder);
+            var frameDataBuilder = _formatter.CreateMoveData(move);
 
             if (!string.IsNullOrWhiteSpace(frameDataBuilder.ToString()))
             {
                 embedBuilder.AddField("Frame Data", frameDataBuilder.ToString(), true);
             }
 
-            var hitboxStringBuilder = AddHitboxDataToEmbedBuilder(move);
+            var hitboxStringBuilder = _formatter.CreateHitboxData(move);
             if (!string.IsNullOrWhiteSpace(hitboxStringBuilder.ToString()))
             {
                 AddString("Source", "https://www.ikneedata.com", hitboxStringBuilder);
                 hitboxStringBuilder.AppendLine("id0=Red, id1=Green, id2=Purple, id3=Orange");
-                hitboxStringBuilder.AppendLine("Credits to MWStage for the colored GIFs");
+                // Temporary take out the credit to prepare for update.
+                //hitboxStringBuilder.AppendLine("Credits to MWStage for the colored GIFs");
                 embedBuilder.AddField("Hitbox summary", hitboxStringBuilder.ToString());
             }
 
             return embedBuilder.Build();
         }
 
-        private StringBuilder AddHitboxDataToEmbedBuilder(Move move)
-        {
-            var hitboxSummary = new StringBuilder();
-            AddString("Name", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Name)), hitboxSummary);
-            AddString("Damage", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Damage)), hitboxSummary);
-            AddString("Effect", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Effect)), hitboxSummary);
-            AddString("Angle", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Angle)), hitboxSummary);
-            AddString("Base knockback", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.BaseKnockback)), hitboxSummary);
-            AddString("Knockback growth", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.KnockbackGrowth)), hitboxSummary);
-            AddString("Set knockback", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.SetKnockback)), hitboxSummary);
-            AddString("Shieldstun", string.Join('/', move.Hitboxes.Select(hitbox => hitbox.Shieldstun)), hitboxSummary);
 
-            return hitboxSummary;
-        }
 
         public Embed CreateMoveListEmbed(WrapperCharacter character, List<Move> moves, Character fightCoreCharacter)
         {
@@ -206,25 +157,6 @@ namespace FightCore.Bot.EmbedCreators.Characters
             return AddFooter(embedBuilder);
         }
 
-        private static void AddIfPossible(string key, int? value, StringBuilder stringBuilder)
-        {
-            if (!value.HasValue || value <= 0)
-            {
-                return;
-            }
-
-            stringBuilder.Append($"**{key}:** {value}\n");
-        }
-
-        private static void AddIfPossible(string key, double? value, StringBuilder stringBuilder)
-        {
-            if (!value.HasValue || value <= 0)
-            {
-                return;
-            }
-
-            stringBuilder.Append($"**{key}:** {value}\n");
-        }
 
         private static void AddString(string key, string value, StringBuilder stringBuilder)
         {

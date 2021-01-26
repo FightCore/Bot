@@ -1,5 +1,7 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace FightCore.Logic.Search
 {
@@ -7,7 +9,7 @@ namespace FightCore.Logic.Search
     {
         public static string Normalize(string value)
         {
-            var removedChars = new string[] {"-", "_", ".", "@", "`", "\"", " ", "(", ")"};
+            var removedChars = new string[] {"-", "_", ".", "@", "`", "\"", " ", "(", ")", "="};
 
             value = removedChars.
                 Aggregate(value, (current, removedChar) =>
@@ -17,7 +19,7 @@ namespace FightCore.Logic.Search
         }
         public static string NormalizeKeepSpace(string value)
         {
-            var removedChars = new string[] { "-", "_", ".", "@", "`", "\"", "(", ")" };
+            var removedChars = new string[] { "-", "_", ".", "@", "`", "\"", "(", ")", "=" };
 
             value = removedChars.
                 Aggregate(value, (current, removedChar) =>
@@ -28,29 +30,31 @@ namespace FightCore.Logic.Search
 
         public static string FindMatch(ICollection<string> collection, string value)
         {
-            foreach (var item in collection)
+            string highestScoreEntry = null;
+            var highestScore = 0.7;
+            foreach (var entry in collection)
             {
-                if (value.Length != item.Length)
+                var score = JaroWinklerDistance.proximity(entry, value);
+                if (score < highestScore)
                 {
                     continue;
                 }
 
-                var distance =
-                    value.ToCharArray()
-                        .Zip(item.ToCharArray(), (c1, c2) => new { c1, c2 })
-                        .Count(m => m.c1 != m.c2);
-                if (distance == value.Length)
-                {
-                    continue;
-                }
-
-                if (distance < 2)
-                {
-                    return item;
-                }
+                highestScore = score;
+                highestScoreEntry = entry;
             }
 
-            return null;
+            return highestScoreEntry;
+
+            // Left unused for now, can be used as secondary check
+            return (from item in collection
+                where value.Length == item.Length
+                let distance = value.ToCharArray()
+                    .Zip(item.ToCharArray(), (c1, c2) => new {c1, c2})
+                    .Count(m => m.c1 != m.c2)
+                where distance != value.Length
+                where distance < 2
+                select item).FirstOrDefault();
         }
     }
 }

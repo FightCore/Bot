@@ -21,6 +21,7 @@ namespace FightCore.Bot.Services
         private readonly ModuleSettings _moduleSettings;
         private readonly FailedMessageService _failedMessageService;
         private readonly IServerSettingsService _serverSettingsService;
+        private readonly AerialReactionService _aerialReactionService;
 
         private readonly Dictionary<string, Type> _moduleDictionary = new Dictionary<string, Type>()
         {
@@ -36,6 +37,7 @@ namespace FightCore.Bot.Services
             IOptions<ModuleSettings> moduleOptions,
             IOptions<CommandSettings> commandSettings,
             IServerSettingsService serverSettingsService,
+            AerialReactionService aerialReactionService,
             FailedMessageService failedMessageService)
         {
             _discord = discord;
@@ -45,8 +47,10 @@ namespace FightCore.Bot.Services
             _moduleSettings = moduleOptions.Value;
             _discord.MessageReceived += MessageReceived;
             _discord.MessageUpdated += DiscordOnMessageUpdated;
+            _discord.ReactionAdded += ClientOnReactionAdded;
             _failedMessageService = failedMessageService;
             _serverSettingsService = serverSettingsService;
+            _aerialReactionService = aerialReactionService;
         }
 
         private async Task DiscordOnMessageUpdated(Cacheable<IMessage, ulong> originalMessage, SocketMessage socketMessage, ISocketMessageChannel channel)
@@ -89,6 +93,21 @@ namespace FightCore.Bot.Services
 
                 await botMessage.ModifyAsync(editMessage => editMessage.Content = resultMessage);
             }
+        }
+
+        private Task ClientOnReactionAdded(Cacheable<IUserMessage, ulong> cacheable, ISocketMessageChannel channel, SocketReaction reaction)
+        {
+            if (!(reaction.Emote is Emoji emoji) || !Equals(emoji, new Emoji("💨")))
+            {
+                return Task.CompletedTask;
+            }
+
+            if (!_aerialReactionService.ContainsMessage(reaction.MessageId))
+            {
+                return Task.CompletedTask;
+            }
+
+            return Task.CompletedTask;
         }
 
         public async Task InitializeAsync(IServiceProvider provider)
