@@ -19,6 +19,7 @@ namespace FightCore.Bot.Modules
         [Command("prefix")]
         public async Task SetPrefix(string prefix)
         {
+            return;
             if (!(Context.User is SocketGuildUser guidUser))
             {
                 await ReplyAsync("Not in a server");
